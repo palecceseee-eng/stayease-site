@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Lisina — Guida ospiti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16302E;
+    --bg:#FBF8F2;
+    --sand:#E8DCC3;
+    --lagoon:#3A7D7A;
+    --lagoon-deep:#1F4E4B;
+    --brick:#A8482F;
+    --muted:#6B6259;
+    --line: rgba(22,48,46,0.12);
+    --radius: 4px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    position:relative;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--lagoon-deep);
+    color:var(--bg);
+    padding:52px 28px 40px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:-1px;
+    height:34px;
+    background:var(--bg);
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
+    -webkit-mask-size:100% 100%;
+    mask-size:100% 100%;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--sand);
+    opacity:0.85;
+    margin:0 0 18px;
+  }
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:40px;
+    line-height:1.05;
+    margin:0 0 12px;
+  }
+  .hero p{
+    font-size:15px;
+    color:var(--sand);
+    max-width:34ch;
+    margin:0;
+  }
+  .host-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:26px;
+    font-size:13px;
+    color:var(--bg);
+    opacity:0.9;
+  }
+  .host-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--brick);
+    flex:none;
+  }
+
+  /* ---------- NAV PILLS ---------- */
+  .nav{
+    display:flex;
+    gap:8px;
+    padding:18px 20px 6px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    z-index:5;
+    border-bottom:1px solid var(--line);
+  }
+  .nav::-webkit-scrollbar{display:none;}
+  .nav a{
+    flex:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.02em;
+    text-decoration:none;
+    color:var(--ink);
+    background:var(--sand);
+    padding:8px 13px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section{
+    padding:38px 28px;
+    border-bottom:1px solid var(--line);
+    scroll-margin-top:64px;
+  }
+  .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--lagoon);
+    margin:0 0 8px;
+  }
+  h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:25px;
+    margin:0 0 18px;
+    color:var(--ink);
+  }
+
+  /* wifi */
+  .wifi-card{
+    background:var(--lagoon-deep);
+    color:var(--bg);
+    border-radius:var(--radius);
+    padding:22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+  }
+  .wifi-field .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--sand);
+    opacity:0.75;
+    margin-bottom:5px;
+  }
+  .wifi-field .value{
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px;
+    letter-spacing:0.02em;
+  }
+  .wifi-field + .wifi-field{ margin-top:16px; }
+  .wifi-cols{ display:flex; flex-direction:column; }
+
+  /* tide / times */
+  .tide{
+    display:flex;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .tide > div{
+    flex:1;
+    padding:18px 16px;
+    text-align:left;
+  }
+  .tide > div:first-child{
+    border-right:1px solid var(--line);
+  }
+  .tide .t-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .tide .t-time{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    color:var(--ink);
+  }
+  .rules{
+    list-style:none;
+    margin:20px 0 0;
+    padding:0;
+  }
+  .rules li{
+    display:flex;
+    gap:12px;
+    padding:12px 0;
+    border-top:1px solid var(--line);
+    font-size:14.5px;
+  }
+  .rules li:first-child{ border-top:none; }
+  .rules li .mark{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--brick);
+    flex:none;
+  }
+
+  /* local guide */
+  .spot{
+    display:flex;
+    gap:14px;
+    padding:16px 0;
+    border-top:1px solid var(--line);
+  }
+  .spot:first-of-type{ border-top:none; margin-top:4px; }
+  .spot .tag{
+    flex:none;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:var(--sand);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--lagoon-deep);
+  }
+  .spot h3{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    margin:2px 0 4px;
+  }
+  .spot p{
+    font-size:13.5px;
+    color:var(--muted);
+    margin:0;
+  }
+  .spot .dist{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--lagoon);
+    margin-top:6px;
+    display:inline-block;
+  }
+
+  /* contact */
+  .contact{
+    background:var(--sand);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+  .contact p{
+    margin:0 0 16px;
+    font-size:14px;
+    color:var(--ink);
+  }
+  .contact-btn{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--ink);
+    color:var(--bg);
+    text-decoration:none;
+    padding:14px 18px;
+    border-radius:var(--radius);
+    font-size:14px;
+    font-weight:500;
+  }
+  .contact-btn .arrow{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--brick);
+  }
+
+  footer{
+    padding:30px 28px 44px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <p class="eyebrow">Casa Lisina · Lesina, Puglia</p>
+    <h1>Benvenuti<br>sulla laguna.</h1>
+    <p>Tutto quello che vi serve per il soggiorno — wifi, orari, e i posti che ameremmo farvi scoprire.</p>
+    <div class="host-row">
+      <span class="host-dot"></span>
+      <span>Ospitati da Maria &amp; Vito</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="#wifi">Wifi</a>
+    <a href="#orari">Orari &amp; regole</a>
+    <a href="#zona">In giro per Lesina</a>
+    <a href="#contatti">Contatti</a>
+  </nav>
+
+  <section id="wifi">
+    <p class="kicker">Connessione</p>
+    <h2>Wifi di casa</h2>
+    <div class="wifi-card">
+      <div class="wifi-cols">
+        <div class="wifi-field">
+          <div class="label">Rete</div>
+          <div class="value">CasaLisina_Guest</div>
+        </div>
+        <div class="wifi-field">
+          <div class="label">Password</div>
+          <div class="value">laguna2026</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="orari">
+    <p class="kicker">Da sapere</p>
+    <h2>Orari &amp; regole</h2>
+    <div class="tide">
+      <div>
+        <div class="t-label">Check-in</div>
+        <div class="t-time">15:00</div>
+      </div>
+      <div>
+        <div class="t-label">Check-out</div>
+        <div class="t-time">10:30</div>
+      </div>
+    </div>
+    <ul class="rules">
+      <li><span class="mark">·</span> Silenzio dopo le 22:30, la laguna si sente meglio col silenzio</li>
+      <li><span class="mark">·</span> Non si fuma negli spazi interni</li>
+      <li><span class="mark">·</span> Animali ammessi su richiesta</li>
+      <li><span class="mark">·</span> Le chiavi restano nella cassetta all'ingresso al check-out</li>
+    </ul>
+  </section>
+
+  <section id="zona">
+    <p class="kicker">Consigli locali</p>
+    <h2>In giro per Lesina</h2>
+
+    <div class="spot">
+      <div class="tag">①</div>
+      <div>
+        <h3>Trattoria da Peppino</h3>
+        <p>Anguilla alla griglia e pesce di laguna, come lo cucinava mio nonno.</p>
+        <span class="dist">6 min a piedi</span>
+      </div>
+    </div>
+    <div class="spot">
+      <div class="tag">②</div>
+      <div>
+        <h3>Isola di Varano</h3>
+        <p>Giro in barca sulla laguna al tramonto, da prenotare in porto.</p>
+        <span class="dist">10 min in auto</span>
+      </div>
+    </div>
+    <div class="spot">
+      <div class="tag">③</div>
+      <div>
+        <h3>Castello Svevo</h3>
+        <p>Vista sulla laguna dall'alto, ingresso libero fino al tramonto.</p>
+        <span class="dist">4 min a piedi</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="contatti">
+    <p class="kicker">Serve aiuto?</p>
+    <h2>Scriveteci</h2>
+    <div class="contact">
+      <p>Siamo qui per qualsiasi cosa, anche solo un consiglio per la cena.</p>
+      <a class="contact-btn" href="https://wa.me/390000000000">
+        <span>Scrivi su WhatsApp</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>CASA LISINA — GUIDA OSPITI</footer>
+
+</div>
+</body>
+</html>

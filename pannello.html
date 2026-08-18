@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayEase — Pannello host</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16302E;
+    --bg:#FBF8F2;
+    --sand:#E8DCC3;
+    --lagoon:#3A7D7A;
+    --lagoon-deep:#1F4E4B;
+    --brick:#A8482F;
+    --muted:#6B6259;
+    --line: rgba(22,48,46,0.14);
+    --radius: 4px;
+    --panel-w: 560px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;}
+
+  /* ---------- TOP SWITCH ---------- */
+  .switcher{
+    position:sticky; top:0; z-index:20;
+    display:flex; gap:0;
+    background:var(--ink);
+    padding:10px;
+    justify-content:center;
+  }
+  .switcher button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    background:transparent;
+    color:var(--sand);
+    border:none;
+    padding:9px 18px;
+    border-radius:20px;
+    cursor:pointer;
+    opacity:0.65;
+  }
+  .switcher button.active{
+    background:var(--bg);
+    color:var(--ink);
+    opacity:1;
+  }
+  .status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    color:var(--sand);
+    opacity:0.6;
+    text-align:center;
+    padding:6px 0 2px;
+    background:var(--ink);
+    min-height:14px;
+  }
+
+  /* ---------- HOST PANEL ---------- */
+  #panel{
+    max-width:var(--panel-w);
+    margin:0 auto;
+    padding:32px 22px 80px;
+  }
+  .p-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--lagoon);
+    margin:0 0 6px;
+  }
+  #panel h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:28px;
+    margin:0 0 30px;
+  }
+  .block{
+    border-top:1px solid var(--line);
+    padding:26px 0;
+  }
+  .block:first-of-type{ border-top:none; }
+  .block h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:17px;
+    margin:0 0 16px;
+  }
+  label{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:14px 0 6px;
+  }
+  label:first-child{ margin-top:0; }
+  input[type=text], textarea{
+    width:100%;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:11px 12px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+  }
+  textarea{ resize:vertical; min-height:52px; }
+  input:focus, textarea:focus{ outline:2px solid var(--lagoon); outline-offset:1px; }
+
+  .two-col{ display:flex; gap:12px; }
+  .two-col > div{ flex:1; }
+
+  .item-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:10px;
+    position:relative;
+  }
+  .item-card .remove{
+    position:absolute; top:10px; right:10px;
+    background:none; border:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--brick);
+    cursor:pointer;
+    opacity:0.7;
+  }
+  .item-card .remove:hover{ opacity:1; }
+
+  .add-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--sand);
+    border:none;
+    border-radius:20px;
+    padding:9px 16px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink);
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .add-btn:hover{ background:#ddcda8; }
+
+  .save-row{
+    position:sticky;
+    bottom:0;
+    background:linear-gradient(to top, var(--bg) 65%, transparent);
+    padding:22px 0 8px;
+    margin-top:10px;
+  }
+  .save-btn{
+    width:100%;
+    background:var(--ink);
+    color:var(--bg);
+    border:none;
+    border-radius:var(--radius);
+    padding:15px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+  }
+  .save-btn:active{ opacity:0.85; }
+  .save-note{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--muted);
+    text-align:center;
+    margin-top:10px;
+  }
+
+  /* ---------- GUEST PREVIEW (reused visual language) ---------- */
+  #preview{ display:none; }
+  .g-wrap{ max-width:480px; margin:0 auto; min-height:100vh; }
+  .g-hero{
+    background:var(--lagoon-deep); color:var(--bg);
+    padding:52px 28px 40px; position:relative; overflow:hidden;
+  }
+  .g-hero::after{
+    content:""; position:absolute; left:0; right:0; bottom:-1px; height:34px;
+    background:var(--bg);
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
+    -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  }
+  .g-eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--sand); opacity:0.85; margin:0 0 18px;}
+  .g-hero h1{ font-family:'Fraunces', serif; font-weight:500; font-size:38px; line-height:1.08; margin:0 0 12px; white-space:pre-line;}
+  .g-hero p{ font-size:15px; color:var(--sand); max-width:34ch; margin:0; }
+  .host-row{ display:flex; align-items:center; gap:10px; margin-top:26px; font-size:13px; color:var(--bg); opacity:0.9;}
+  .host-dot{ width:6px;height:6px;border-radius:50%; background:var(--brick); flex:none;}
+  .g-nav{ display:flex; gap:8px; padding:18px 20px 6px; overflow-x:auto; scrollbar-width:none; position:sticky; top:44px; background:var(--bg); z-index:5; border-bottom:1px solid var(--line);}
+  .g-nav::-webkit-scrollbar{display:none;}
+  .g-nav a{ flex:none; font-family:'JetBrains Mono', monospace; font-size:11.5px; text-decoration:none; color:var(--ink); background:var(--sand); padding:8px 13px; border-radius:20px; white-space:nowrap;}
+  .g-section{ padding:38px 28px; border-bottom:1px solid var(--line); scroll-margin-top:96px;}
+  .g-kicker{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--lagoon); margin:0 0 8px;}
+  .g-section h2{ font-family:'Fraunces', serif; font-weight:500; font-size:24px; margin:0 0 18px;}
+  .wifi-card{ background:var(--lagoon-deep); color:var(--bg); border-radius:var(--radius); padding:22px;}
+  .wifi-field .label{ font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sand); opacity:0.75; margin-bottom:5px;}
+  .wifi-field .value{ font-family:'JetBrains Mono', monospace; font-size:16px;}
+  .wifi-field + .wifi-field{ margin-top:16px; }
+  .tide{ display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  .tide > div{ flex:1; padding:18px 16px; }
+  .tide > div:first-child{ border-right:1px solid var(--line); }
+  .t-label{ font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+  .t-time{ font-family:'Fraunces', serif; font-size:26px;}
+  .rules{ list-style:none; margin:20px 0 0; padding:0;}
+  .rules li{ display:flex; gap:12px; padding:12px 0; border-top:1px solid var(--line); font-size:14.5px;}
+  .rules li:first-child{ border-top:none; }
+  .rules .mark{ font-family:'JetBrains Mono', monospace; color:var(--brick); flex:none;}
+  .spot{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line);}
+  .spot:first-of-type{ border-top:none; margin-top:4px;}
+  .spot .tag{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--sand); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--lagoon-deep);}
+  .spot h3{ font-weight:600; font-size:15px; margin:2px 0 4px;}
+  .spot p{ font-size:13.5px; color:var(--muted); margin:0;}
+  .spot .dist{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--lagoon); margin-top:6px; display:inline-block;}
+  .contact{ background:var(--sand); border-radius:var(--radius); padding:22px;}
+  .contact p{ margin:0 0 16px; font-size:14px;}
+  .contact-btn{ display:flex; align-items:center; justify-content:space-between; background:var(--ink); color:var(--bg); text-decoration:none; padding:14px 18px; border-radius:var(--radius); font-size:14px; font-weight:500;}
+  .contact-btn .arrow{ font-family:'JetBrains Mono', monospace; color:var(--brick);}
+  .g-footer{ padding:30px 28px 44px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.06em; color:var(--muted); text-align:center;}
+  .empty{ font-size:13px; color:var(--muted); font-style:italic; }
+
+  /* ---------- TENANT SWITCHER ---------- */
+  .tenant-bar{
+    max-width:var(--panel-w);
+    margin:0 auto;
+    padding:22px 22px 0;
+  }
+  .tenant-bar .p-eyebrow{ margin-bottom:6px; }
+  .tenant-row{ display:flex; gap:8px; align-items:flex-end; }
+  .tenant-row > div{ flex:1; }
+  .tenant-row button{
+    flex:none;
+    background:var(--lagoon-deep);
+    color:var(--bg);
+    border:none;
+    border-radius:var(--radius);
+    padding:11px 16px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .url-preview{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    color:var(--lagoon);
+    margin-top:8px;
+  }
+  .url-preview span{ color:var(--muted); }
+  .tenant-note{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    color:var(--muted);
+    margin-top:10px;
+    line-height:1.6;
+  }
+
+  /* ---------- LOGO BADGE ---------- */
+  .g-logo{
+    width:38px; height:38px; border-radius:50%;
+    background:var(--brick); color:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500;
+    flex:none; margin-bottom:14px;
+  }
+  #preview[data-theme="minimal"] .g-logo{ border-radius:0; }
+
+  /* ---------- THEME PICKER (host panel) ---------- */
+  .theme-grid{ display:flex; flex-direction:column; gap:10px; }
+  .theme-card{
+    display:flex; align-items:center; gap:14px;
+    background:#fff; border:1.5px solid var(--line); border-radius:var(--radius);
+    padding:14px 16px; cursor:pointer;
+  }
+  .theme-card.selected{ border-color:var(--lagoon); }
+  .theme-swatch{ display:flex; flex:none; }
+  .theme-swatch span{ width:16px; height:16px; margin-left:-6px; border-radius:50%; border:2px solid #fff; }
+  .theme-swatch span:first-child{ margin-left:0; }
+  .theme-text h3{ font-family:'Inter',sans-serif; font-weight:600; font-size:14px; margin:0 0 3px; }
+  .theme-text p{ font-size:12.5px; color:var(--muted); margin:0; }
+  .theme-check{ margin-left:auto; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--lagoon); flex:none; opacity:0; }
+  .theme-card.selected .theme-check{ opacity:1; }
+
+  /* ---------- THEME OVERRIDES (guest preview only) ---------- */
+  #preview[data-theme="masseria"]{
+    --ink:#2B2620; --bg:#F5EEE1; --sand:#D9CBAE;
+    --lagoon:#6B7A4F; --lagoon-deep:#4A3F2E; --brick:#8C4A2F;
+  }
+  #preview[data-theme="minimal"]{
+    --ink:#111111; --bg:#FFFFFF; --sand:#EDEDED;
+    --lagoon:#111111; --lagoon-deep:#111111; --brick:#C1440E;
+    --radius:0px;
+  }
+  #preview[data-theme="masseria"] .g-hero::after{
+    content:""; -webkit-mask-image:none; mask-image:none;
+    height:3px; background:var(--brick); bottom:0;
+  }
+  #preview[data-theme="minimal"] .g-hero::after{ display:none; }
+  #preview[data-theme="minimal"] .g-hero{ border-bottom:1px solid #fff; }
+  #preview[data-theme="minimal"] .g-hero h1{
+    font-family:'Inter',sans-serif; font-weight:600; letter-spacing:-0.01em;
+  }
+  #preview[data-theme="minimal"] .g-section h2{
+    font-family:'Inter',sans-serif; font-weight:600;
+  }
+  #preview[data-theme="minimal"] .g-nav a{
+    background:transparent; border:1px solid var(--ink); border-radius:0;
+  }
+  #preview[data-theme="minimal"] .spot .tag{ border-radius:0; }
+  #preview[data-theme="minimal"] .wifi-card{ border:1px solid var(--ink); }
+  #preview[data-theme="masseria"] .g-eyebrow, #preview[data-theme="masseria"] .g-kicker{
+    font-style:italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="switcher">
+  <button id="btn-panel" class="active">Pannello host</button>
+  <button id="btn-preview">Anteprima ospite</button>
+</div>
+<div class="status" id="status"></div>
+
+<div class="tenant-bar">
+  <p class="p-eyebrow">Struttura attiva</p>
+  <div class="tenant-row">
+    <div>
+      <label style="margin-top:0">Identificativo URL (slug)</label>
+      <input type="text" id="f-slug" placeholder="casa-lisina">
+    </div>
+    <button id="load-tenant">Carica / crea</button>
+  </div>
+  <p class="url-preview"><span>tuaapp.com/</span><span id="slug-preview">casa-lisina</span></p>
+  <p class="tenant-note">Ogni slug è una struttura indipendente: contenuti, tema e wifi separati, salvati sotto lo stesso dominio.</p>
+</div>
+
+<!-- ============ HOST PANEL ============ -->
+<div id="panel">
+  <p class="p-eyebrow">StayEase · Editor contenuti</p>
+  <h1>Modifica la tua guida</h1>
+
+  <div class="block">
+    <h2>Struttura</h2>
+    <label>Nome struttura</label>
+    <input type="text" id="f-nome" placeholder="Casa Lisina">
+    <label>Frase di benvenuto (hero)</label>
+    <textarea id="f-titolo" placeholder="Benvenuti sulla laguna."></textarea>
+    <label>Sottotitolo</label>
+    <textarea id="f-sottotitolo" placeholder="Tutto quello che vi serve per il soggiorno..."></textarea>
+    <label>Nomi host</label>
+    <input type="text" id="f-host" placeholder="Maria & Vito">
+    <label>Iniziali logo (2-3 lettere)</label>
+    <input type="text" id="f-logo" placeholder="CL" maxlength="3">
+  </div>
+
+  <div class="block">
+    <h2>Aspetto della pagina</h2>
+    <div class="theme-grid" id="theme-grid"></div>
+  </div>
+
+  <div class="block">
+    <h2>Wifi</h2>
+    <div class="two-col">
+      <div>
+        <label>Nome rete</label>
+        <input type="text" id="f-wifi-nome" placeholder="CasaLisina_Guest">
+      </div>
+      <div>
+        <label>Password</label>
+        <input type="text" id="f-wifi-pass" placeholder="laguna2026">
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Orari</h2>
+    <div class="two-col">
+      <div>
+        <label>Check-in</label>
+        <input type="text" id="f-checkin" placeholder="15:00">
+      </div>
+      <div>
+        <label>Check-out</label>
+        <input type="text" id="f-checkout" placeholder="10:30">
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Regole della casa</h2>
+    <div id="rules-list"></div>
+    <button class="add-btn" id="add-rule">+ aggiungi regola</button>
+  </div>
+
+  <div class="block">
+    <h2>Consigli in zona</h2>
+    <div id="spots-list"></div>
+    <button class="add-btn" id="add-spot">+ aggiungi consiglio</button>
+  </div>
+
+  <div class="block">
+    <h2>Contatto</h2>
+    <label>Numero WhatsApp (con prefisso, solo cifre)</label>
+    <input type="text" id="f-whatsapp" placeholder="390000000000">
+  </div>
+
+  <div class="save-row">
+    <button class="save-btn" id="save-btn">Salva modifiche</button>
+    <p class="save-note">Le modifiche si vedono subito in "Anteprima ospite"</p>
+  </div>
+</div>
+
+<!-- ============ GUEST PREVIEW ============ -->
+<div id="preview">
+  <div class="g-wrap">
+    <div class="g-hero">
+      <div class="g-logo" id="g-logo">CL</div>
+      <p class="g-eyebrow" id="g-eyebrow">Casa Lisina · Lesina, Puglia</p>
+      <h1 id="g-titolo">Benvenuti<br>sulla laguna.</h1>
+      <p id="g-sottotitolo">Tutto quello che vi serve per il soggiorno.</p>
+      <div class="host-row">
+        <span class="host-dot"></span>
+        <span id="g-host">Ospitati da Maria &amp; Vito</span>
+      </div>
+    </div>
+
+    <nav class="g-nav">
+      <a href="#g-wifi">Wifi</a>
+      <a href="#g-orari">Orari &amp; regole</a>
+      <a href="#g-zona">In zona</a>
+      <a href="#g-contatti">Contatti</a>
+    </nav>
+
+    <section class="g-section" id="g-wifi">
+      <p class="g-kicker">Connessione</p>
+      <h2>Wifi di casa</h2>
+      <div class="wifi-card">
+        <div class="wifi-field">
+          <div class="label">Rete</div>
+          <div class="value" id="g-wifi-nome">—</div>
+        </div>
+        <div class="wifi-field">
+          <div class="label">Password</div>
+          <div class="value" id="g-wifi-pass">—</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="g-section" id="g-orari">
+      <p class="g-kicker">Da sapere</p>
+      <h2>Orari &amp; regole</h2>
+      <div class="tide">
+        <div>
+          <div class="t-label">Check-in</div>
+          <div class="t-time" id="g-checkin">—</div>
+        </div>
+        <div>
+          <div class="t-label">Check-out</div>
+          <div class="t-time" id="g-checkout">—</div>
+        </div>
+      </div>
+      <ul class="rules" id="g-rules"></ul>
+    </section>
+
+    <section class="g-section" id="g-zona">
+      <p class="g-kicker">Consigli locali</p>
+      <h2>In giro per Lesina</h2>
+      <div id="g-spots"></div>
+    </section>
+
+    <section class="g-section" id="g-contatti">
+      <p class="g-kicker">Serve aiuto?</p>
+      <h2>Scriveteci</h2>
+      <div class="contact">
+        <p>Siamo qui per qualsiasi cosa, anche solo un consiglio per la cena.</p>
+        <a class="contact-btn" id="g-whatsapp" href="#">
+          <span>Scrivi su WhatsApp</span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
+    </section>
+
+    <footer class="g-footer" id="g-footer">CASA LISINA — GUIDA OSPITI</footer>
+  </div>
+</div>
+
+<script>
+
+// Ponte temporaneo: salva nel browser (localStorage) finché non colleghiamo Supabase.
+// Stessa interfaccia di window.storage, così il resto del codice non cambia.
+const storage = {
+  async get(key, shared){
+    const v = localStorage.getItem(key);
+    if(v === null) throw new Error('not found');
+    return { key, value: v, shared: !!shared };
+  },
+  async set(key, value, shared){
+    localStorage.setItem(key, value);
+    return { key, value, shared: !!shared };
+  }
+};
+const THEMES = [
+  { key:'laguna', nome:'Laguna', desc:'Toni acqua e sabbia, angoli morbidi, divisorio a onda.', colors:['#1F4E4B','#E8DCC3','#A8482F'] },
+  { key:'masseria', nome:'Masseria', desc:'Pietra e ulivo, tocco rustico, corsivo negli eyebrow.', colors:['#4A3F2E','#D9CBAE','#8C4A2F'] },
+  { key:'minimal', nome:'Bianco minimale', desc:'Bianco e nero, angoli netti, un accento acceso.', colors:['#111111','#EDEDED','#C1440E'] }
+];
+
+const defaults = {
+  theme: 'laguna',
+  nome: 'Casa Lisina',
+  titolo: 'Benvenuti\nsulla laguna.',
+  sottotitolo: "Tutto quello che vi serve per il soggiorno — wifi, orari, e i posti che ameremmo farvi scoprire.",
+  host: 'Maria & Vito',
+  logoIniziali: 'CL',
+  wifiNome: 'CasaLisina_Guest',
+  wifiPass: 'laguna2026',
+  checkin: '15:00',
+  checkout: '10:30',
+  whatsapp: '390000000000',
+  rules: [
+    "Silenzio dopo le 22:30, la laguna si sente meglio col silenzio",
+    "Non si fuma negli spazi interni",
+    "Animali ammessi su richiesta",
+    "Le chiavi restano nella cassetta all'ingresso al check-out"
+  ],
+  spots: [
+    { nome: "Trattoria da Peppino", desc: "Anguilla alla griglia e pesce di laguna, come lo cucinava mio nonno.", dist: "6 min a piedi" },
+    { nome: "Isola di Varano", desc: "Giro in barca sulla laguna al tramonto, da prenotare in porto.", dist: "10 min in auto" },
+    { nome: "Castello Svevo", desc: "Vista sulla laguna dall'alto, ingresso libero fino al tramonto.", dist: "4 min a piedi" }
+  ]
+};
+
+let currentSlug = 'casa-lisina';
+let state = JSON.parse(JSON.stringify(defaults));
+
+function storageKeyFor(slug){
+  return `bnb:${slug}:content`;
+}
+
+function slugify(raw){
+  return (raw || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'struttura';
+}
+
+function setStatus(msg, isErr){
+  const el = document.getElementById('status');
+  el.textContent = msg || '';
+  el.style.color = isErr ? '#D97757' : '';
+  if(msg){ setTimeout(()=>{ if(el.textContent === msg) el.textContent=''; }, 2500); }
+}
+
+async function loadState(slug){
+  currentSlug = slug || currentSlug;
+  document.getElementById('f-slug').value = currentSlug;
+  document.getElementById('slug-preview').textContent = currentSlug;
+  state = JSON.parse(JSON.stringify(defaults));
+  try{
+    const res = await storage.get(storageKeyFor(currentSlug), true);
+    if(res && res.value){
+      state = JSON.parse(res.value);
+      setStatus(`Struttura "${currentSlug}" caricata`);
+    } else {
+      setStatus(`Nuova struttura "${currentSlug}" — compila e salva`);
+    }
+  }catch(e){
+    setStatus(`Nuova struttura "${currentSlug}" — compila e salva`);
+  }
+  fillForm();
+  renderPreview();
+}
+
+async function saveState(){
+  readForm();
+  try{
+    const result = await storage.set(storageKeyFor(currentSlug), JSON.stringify(state), true);
+    if(result){
+      setStatus('Salvato ✓');
+    } else {
+      setStatus('Salvataggio non riuscito, riprova', true);
+    }
+  }catch(e){
+    setStatus('Errore di salvataggio', true);
+  }
+  renderPreview();
+}
+
+function fillForm(){
+  document.getElementById('f-nome').value = state.nome;
+  document.getElementById('f-titolo').value = state.titolo;
+  document.getElementById('f-sottotitolo').value = state.sottotitolo;
+  document.getElementById('f-host').value = state.host;
+  document.getElementById('f-logo').value = state.logoIniziali;
+  document.getElementById('f-wifi-nome').value = state.wifiNome;
+  document.getElementById('f-wifi-pass').value = state.wifiPass;
+  document.getElementById('f-checkin').value = state.checkin;
+  document.getElementById('f-checkout').value = state.checkout;
+  document.getElementById('f-whatsapp').value = state.whatsapp;
+  renderRulesEditor();
+  renderSpotsEditor();
+  renderThemePicker();
+}
+
+function renderThemePicker(){
+  const wrap = document.getElementById('theme-grid');
+  wrap.innerHTML = '';
+  THEMES.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'theme-card' + (state.theme === t.key ? ' selected' : '');
+    card.innerHTML = `
+      <div class="theme-swatch">
+        ${t.colors.map(c => `<span style="background:${c}"></span>`).join('')}
+      </div>
+      <div class="theme-text">
+        <h3>${t.nome}</h3>
+        <p>${t.desc}</p>
+      </div>
+      <span class="theme-check">selezionato</span>
+    `;
+    card.addEventListener('click', ()=>{
+      state.theme = t.key;
+      renderThemePicker();
+      applyTheme();
+    });
+    wrap.appendChild(card);
+  });
+}
+
+function applyTheme(){
+  document.getElementById('preview').setAttribute('data-theme', state.theme || 'laguna');
+}
+
+function readForm(){
+  state.nome = document.getElementById('f-nome').value || defaults.nome;
+  state.titolo = document.getElementById('f-titolo').value || defaults.titolo;
+  state.sottotitolo = document.getElementById('f-sottotitolo').value || defaults.sottotitolo;
+  state.host = document.getElementById('f-host').value || defaults.host;
+  state.logoIniziali = (document.getElementById('f-logo').value || defaults.logoIniziali).toUpperCase();
+  state.wifiNome = document.getElementById('f-wifi-nome').value || defaults.wifiNome;
+  state.wifiPass = document.getElementById('f-wifi-pass').value || defaults.wifiPass;
+  state.checkin = document.getElementById('f-checkin').value || defaults.checkin;
+  state.checkout = document.getElementById('f-checkout').value || defaults.checkout;
+  state.whatsapp = document.getElementById('f-whatsapp').value || defaults.whatsapp;
+  // rules & spots are kept in sync live via their own handlers
+}
+
+function renderRulesEditor(){
+  const wrap = document.getElementById('rules-list');
+  wrap.innerHTML = '';
+  state.rules.forEach((rule, i) => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <button class="remove" data-i="${i}">rimuovi</button>
+      <label>Regola ${i+1}</label>
+      <input type="text" data-idx="${i}" class="rule-input" value="${escapeHtml(rule)}">
+    `;
+    wrap.appendChild(card);
+  });
+  wrap.querySelectorAll('.rule-input').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      state.rules[+e.target.dataset.idx] = e.target.value;
+    });
+  });
+  wrap.querySelectorAll('.remove').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      state.rules.splice(+e.target.dataset.i, 1);
+      renderRulesEditor();
+    });
+  });
+}
+
+function renderSpotsEditor(){
+  const wrap = document.getElementById('spots-list');
+  wrap.innerHTML = '';
+  state.spots.forEach((spot, i) => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <button class="remove" data-i="${i}">rimuovi</button>
+      <label>Nome posto</label>
+      <input type="text" data-idx="${i}" data-field="nome" class="spot-input" value="${escapeHtml(spot.nome)}">
+      <label>Descrizione</label>
+      <textarea data-idx="${i}" data-field="desc" class="spot-input">${escapeHtml(spot.desc)}</textarea>
+      <label>Distanza</label>
+      <input type="text" data-idx="${i}" data-field="dist" class="spot-input" value="${escapeHtml(spot.dist)}">
+    `;
+    wrap.appendChild(card);
+  });
+  wrap.querySelectorAll('.spot-input').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const idx = +e.target.dataset.idx;
+      const field = e.target.dataset.field;
+      state.spots[idx][field] = e.target.value;
+    });
+  });
+  wrap.querySelectorAll('.remove').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      state.spots.splice(+e.target.dataset.i, 1);
+      renderSpotsEditor();
+    });
+  });
+}
+
+function escapeHtml(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderPreview(){
+  applyTheme();
+  document.getElementById('g-logo').textContent = state.logoIniziali;
+  document.getElementById('g-eyebrow').textContent = `${state.nome} · Lesina, Puglia`;
+  document.getElementById('g-titolo').textContent = state.titolo;
+  document.getElementById('g-sottotitolo').textContent = state.sottotitolo;
+  document.getElementById('g-host').textContent = `Ospitati da ${state.host}`;
+  document.getElementById('g-wifi-nome').textContent = state.wifiNome;
+  document.getElementById('g-wifi-pass').textContent = state.wifiPass;
+  document.getElementById('g-checkin').textContent = state.checkin;
+  document.getElementById('g-checkout').textContent = state.checkout;
+  document.getElementById('g-whatsapp').href = `https://wa.me/${state.whatsapp}`;
+  document.getElementById('g-footer').textContent = `${state.nome.toUpperCase()} — GUIDA OSPITI`;
+
+  const rulesEl = document.getElementById('g-rules');
+  rulesEl.innerHTML = state.rules.length
+    ? state.rules.map(r => `<li><span class="mark">·</span>${escapeHtml(r)}</li>`).join('')
+    : '<li class="empty">Nessuna regola aggiunta ancora.</li>';
+
+  const nums = ['①','②','③','④','⑤','⑥','⑦','⑧'];
+  const spotsEl = document.getElementById('g-spots');
+  spotsEl.innerHTML = state.spots.length
+    ? state.spots.map((s,i) => `
+        <div class="spot">
+          <div class="tag">${nums[i] || (i+1)}</div>
+          <div>
+            <h3>${escapeHtml(s.nome)}</h3>
+            <p>${escapeHtml(s.desc)}</p>
+            <span class="dist">${escapeHtml(s.dist)}</span>
+          </div>
+        </div>`).join('')
+    : '<p class="empty">Nessun consiglio aggiunto ancora.</p>';
+}
+
+document.getElementById('add-rule').addEventListener('click', ()=>{
+  state.rules.push('Nuova regola');
+  renderRulesEditor();
+});
+document.getElementById('add-spot').addEventListener('click', ()=>{
+  state.spots.push({ nome: 'Nuovo posto', desc: 'Descrizione', dist: '5 min' });
+  renderSpotsEditor();
+});
+document.getElementById('save-btn').addEventListener('click', saveState);
+
+document.getElementById('f-slug').addEventListener('input', e=>{
+  document.getElementById('slug-preview').textContent = slugify(e.target.value);
+});
+document.getElementById('load-tenant').addEventListener('click', ()=>{
+  const slug = slugify(document.getElementById('f-slug').value);
+  loadState(slug);
+});
+
+document.getElementById('btn-panel').addEventListener('click', ()=>{
+  document.getElementById('panel').style.display = 'block';
+  document.getElementById('preview').style.display = 'none';
+  document.getElementById('btn-panel').classList.add('active');
+  document.getElementById('btn-preview').classList.remove('active');
+});
+document.getElementById('btn-preview').addEventListener('click', ()=>{
+  readForm();
+  renderPreview();
+  document.getElementById('panel').style.display = 'none';
+  document.getElementById('preview').style.display = 'block';
+  document.getElementById('btn-preview').classList.add('active');
+  document.getElementById('btn-panel').classList.remove('active');
+});
+
+loadState(currentSlug);
+</script>
+</body>
+</html>
