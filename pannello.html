@@ -223,12 +223,51 @@
   .spot h3{ font-weight:600; font-size:15px; margin:2px 0 4px;}
   .spot p{ font-size:13.5px; color:var(--muted); margin:0;}
   .spot .dist{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--lagoon); margin-top:6px; display:inline-block;}
+  .event{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line);}
+  .event:first-of-type{ border-top:none; margin-top:4px;}
+  .event .date-badge{
+    flex:none; width:44px; text-align:center;
+    background:var(--sand); border-radius:var(--radius); padding:6px 0;
+  }
+  .event .date-badge .day{ font-family:'Fraunces', serif; font-size:16px; font-weight:600; line-height:1.1; color:var(--ink);}
+  .event .date-badge .month{ font-family:'JetBrains Mono', monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted);}
+  .event h3{ font-weight:600; font-size:15px; margin:2px 0 4px;}
+  .event p{ font-size:13.5px; color:var(--muted); margin:0;}
+  #preview[data-theme="minimal"] .event .date-badge{ border-radius:0; }
   .contact{ background:var(--sand); border-radius:var(--radius); padding:22px;}
   .contact p{ margin:0 0 16px; font-size:14px;}
   .contact-btn{ display:flex; align-items:center; justify-content:space-between; background:var(--ink); color:var(--bg); text-decoration:none; padding:14px 18px; border-radius:var(--radius); font-size:14px; font-weight:500;}
   .contact-btn .arrow{ font-family:'JetBrains Mono', monospace; color:var(--brick);}
   .g-footer{ padding:30px 28px 44px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.06em; color:var(--muted); text-align:center;}
   .empty{ font-size:13px; color:var(--muted); font-style:italic; }
+
+  /* ---------- AUTH GATE ---------- */
+  #auth-gate{
+    max-width:380px; margin:80px auto; padding:0 22px; text-align:left;
+  }
+  #auth-gate .p-eyebrow{ margin-bottom:6px; }
+  #auth-gate h1{ font-family:'Fraunces', serif; font-weight:500; font-size:26px; margin:0 0 10px; }
+  #auth-gate p.sub{ font-size:14px; color:var(--muted); margin:0 0 26px; }
+  #auth-gate input[type=email]{
+    width:100%; padding:13px 14px; border:1.5px solid var(--ink); border-radius:var(--radius);
+    font-family:'Inter',sans-serif; font-size:14.5px; margin-bottom:10px;
+  }
+  #auth-gate button{
+    width:100%; background:var(--ink); color:var(--bg); border:none; border-radius:var(--radius);
+    padding:13px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer;
+  }
+  #auth-status{ font-family:'JetBrains Mono', monospace; font-size:12px; margin-top:14px; min-height:16px; }
+  #auth-status.ok{ color:var(--lagoon-deep); }
+  #auth-status.err{ color:var(--brick); }
+  .user-bar{
+    max-width:var(--panel-w); margin:0 auto; padding:14px 22px 0;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--muted);
+  }
+  .user-bar button{
+    background:none; border:1px solid var(--line); border-radius:16px;
+    padding:6px 12px; font-family:'JetBrains Mono', monospace; font-size:11px; cursor:pointer; color:var(--ink);
+  }
 
   /* ---------- TENANT SWITCHER ---------- */
   .tenant-bar{
@@ -326,6 +365,22 @@
 </head>
 <body>
 
+<div id="auth-gate">
+  <p class="p-eyebrow">StayEase · Accesso host</p>
+  <h1>Accedi alla tua guida</h1>
+  <p class="sub">Inseriamo la tua email e ti mandiamo un link di accesso — nessuna password da ricordare.</p>
+  <input type="email" id="auth-email" placeholder="la-tua-email@struttura.it">
+  <button id="send-magic-link">Invia link di accesso</button>
+  <p id="auth-status"></p>
+</div>
+
+<div id="app-content" style="display:none;">
+
+<div class="user-bar">
+  <span id="user-email"></span>
+  <button id="logout-btn">Esci</button>
+</div>
+
 <div class="switcher">
   <button id="btn-panel" class="active">Pannello host</button>
   <button id="btn-preview">Anteprima ospite</button>
@@ -333,16 +388,16 @@
 <div class="status" id="status"></div>
 
 <div class="tenant-bar">
-  <p class="p-eyebrow">Struttura attiva</p>
+  <p class="p-eyebrow">La tua struttura</p>
   <div class="tenant-row">
     <div>
       <label style="margin-top:0">Identificativo URL (slug)</label>
       <input type="text" id="f-slug" placeholder="casa-lisina">
     </div>
-    <button id="load-tenant">Carica / crea</button>
+    <button id="save-slug">Aggiorna slug</button>
   </div>
-  <p class="url-preview"><span>tuaapp.com/</span><span id="slug-preview">casa-lisina</span></p>
-  <p class="tenant-note">Ogni slug è una struttura indipendente: contenuti, tema e wifi separati, salvati sotto lo stesso dominio.</p>
+  <p class="url-preview"><span>stayease.it/</span><span id="slug-preview">casa-lisina</span></p>
+  <p class="tenant-note">Questo è l'indirizzo che i tuoi ospiti apriranno dal QR code.</p>
 </div>
 
 <!-- ============ HOST PANEL ============ -->
@@ -410,6 +465,12 @@
   </div>
 
   <div class="block">
+    <h2>Eventi in zona</h2>
+    <div id="events-list"></div>
+    <button class="add-btn" id="add-event">+ aggiungi evento</button>
+  </div>
+
+  <div class="block">
     <h2>Contatto</h2>
     <label>Numero WhatsApp (con prefisso, solo cifre)</label>
     <input type="text" id="f-whatsapp" placeholder="390000000000">
@@ -438,6 +499,7 @@
     <nav class="g-nav">
       <a href="#g-wifi">Wifi</a>
       <a href="#g-orari">Orari &amp; regole</a>
+      <a href="#g-eventi">Eventi</a>
       <a href="#g-zona">In zona</a>
       <a href="#g-contatti">Contatti</a>
     </nav>
@@ -473,6 +535,12 @@
       <ul class="rules" id="g-rules"></ul>
     </section>
 
+    <section class="g-section" id="g-eventi">
+      <p class="g-kicker">Da non perdere</p>
+      <h2>Eventi in zona</h2>
+      <div id="g-events"></div>
+    </section>
+
     <section class="g-section" id="g-zona">
       <p class="g-kicker">Consigli locali</p>
       <h2>In giro per Lesina</h2>
@@ -495,21 +563,21 @@
   </div>
 </div>
 
-<script>
+</div><!-- fine #app-content -->
 
-// Ponte temporaneo: salva nel browser (localStorage) finché non colleghiamo Supabase.
-// Stessa interfaccia di window.storage, così il resto del codice non cambia.
-const storage = {
-  async get(key, shared){
-    const v = localStorage.getItem(key);
-    if(v === null) throw new Error('not found');
-    return { key, value: v, shared: !!shared };
-  },
-  async set(key, value, shared){
-    localStorage.setItem(key, value);
-    return { key, value, shared: !!shared };
-  }
-};
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ============================================================
+// Configurazione Supabase — sostituisci con i tuoi valori reali
+// (li trovi in Supabase > Project Settings > API)
+// ============================================================
+const SUPABASE_URL = https://hmtrwnhgyyccjrmzmlar.supabase.co;
+const SUPABASE_KEY = sb_publishable_SPxCmxLv_aj14JTbdadr1Q_lJIsI4CO;
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentStructureId = null;
+
 const THEMES = [
   { key:'laguna', nome:'Laguna', desc:'Toni acqua e sabbia, angoli morbidi, divisorio a onda.', colors:['#1F4E4B','#E8DCC3','#A8482F'] },
   { key:'masseria', nome:'Masseria', desc:'Pietra e ulivo, tocco rustico, corsivo negli eyebrow.', colors:['#4A3F2E','#D9CBAE','#8C4A2F'] },
@@ -538,15 +606,15 @@ const defaults = {
     { nome: "Trattoria da Peppino", desc: "Anguilla alla griglia e pesce di laguna, come lo cucinava mio nonno.", dist: "6 min a piedi" },
     { nome: "Isola di Varano", desc: "Giro in barca sulla laguna al tramonto, da prenotare in porto.", dist: "10 min in auto" },
     { nome: "Castello Svevo", desc: "Vista sulla laguna dall'alto, ingresso libero fino al tramonto.", dist: "4 min a piedi" }
+  ],
+  events: [
+    { titolo: "Sagra del pesce di laguna", data: "2026-08-30", desc: "Stand gastronomici e musica dal vivo sul lungomare." },
+    { titolo: "Mercatino artigianale", data: "2026-09-12", desc: "Ogni sabato mattina in piazza, prodotti locali e artigianato." }
   ]
 };
 
 let currentSlug = 'casa-lisina';
 let state = JSON.parse(JSON.stringify(defaults));
-
-function storageKeyFor(slug){
-  return `bnb:${slug}:content`;
-}
 
 function slugify(raw){
   return (raw || '')
@@ -563,37 +631,103 @@ function setStatus(msg, isErr){
   if(msg){ setTimeout(()=>{ if(el.textContent === msg) el.textContent=''; }, 2500); }
 }
 
-async function loadState(slug){
-  currentSlug = slug || currentSlug;
+// ---------- AUTENTICAZIONE ----------
+
+function setAuthStatus(msg, isErr){
+  const el = document.getElementById('auth-status');
+  el.textContent = msg || '';
+  el.className = isErr ? 'err' : 'ok';
+}
+
+async function sendMagicLink(){
+  const email = document.getElementById('auth-email').value.trim();
+  if(!email || !email.includes('@')){
+    setAuthStatus('Inserisci un\'email valida.', true);
+    return;
+  }
+  setAuthStatus('Invio in corso...');
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+  if(error){
+    setAuthStatus('Errore: ' + error.message, true);
+  } else {
+    setAuthStatus('Controlla la tua email: ti abbiamo mandato un link di accesso.');
+  }
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  currentUser = null;
+  currentStructureId = null;
+  showAuthGate();
+}
+
+function showAuthGate(){
+  document.getElementById('auth-gate').style.display = 'block';
+  document.getElementById('app-content').style.display = 'none';
+}
+
+async function showApp(user){
+  currentUser = user;
+  document.getElementById('auth-gate').style.display = 'none';
+  document.getElementById('app-content').style.display = 'block';
+  document.getElementById('user-email').textContent = user.email;
+  await loadMyStructure();
+}
+
+// ---------- CARICAMENTO / SALVATAGGIO STRUTTURA ----------
+
+async function loadMyStructure(){
+  state = JSON.parse(JSON.stringify(defaults));
+  currentStructureId = null;
+
+  const { data, error } = await sb
+    .from('structures')
+    .select('*')
+    .eq('owner_id', currentUser.id)
+    .limit(1)
+    .maybeSingle();
+
+  if(error){
+    setStatus('Errore nel caricamento: ' + error.message, true);
+  } else if(data){
+    currentStructureId = data.id;
+    currentSlug = data.slug;
+    state = { ...state, ...data.content };
+    setStatus('Struttura caricata ✓');
+  } else {
+    currentSlug = slugify(currentUser.email.split('@')[0]);
+    setStatus('Nuova struttura — compila e salva');
+  }
+
   document.getElementById('f-slug').value = currentSlug;
   document.getElementById('slug-preview').textContent = currentSlug;
-  state = JSON.parse(JSON.stringify(defaults));
-  try{
-    const res = await storage.get(storageKeyFor(currentSlug), true);
-    if(res && res.value){
-      state = JSON.parse(res.value);
-      setStatus(`Struttura "${currentSlug}" caricata`);
-    } else {
-      setStatus(`Nuova struttura "${currentSlug}" — compila e salva`);
-    }
-  }catch(e){
-    setStatus(`Nuova struttura "${currentSlug}" — compila e salva`);
-  }
   fillForm();
   renderPreview();
 }
 
 async function saveState(){
   readForm();
-  try{
-    const result = await storage.set(storageKeyFor(currentSlug), JSON.stringify(state), true);
-    if(result){
-      setStatus('Salvato ✓');
-    } else {
-      setStatus('Salvataggio non riuscito, riprova', true);
-    }
-  }catch(e){
-    setStatus('Errore di salvataggio', true);
+  currentSlug = slugify(document.getElementById('f-slug').value || currentSlug);
+  document.getElementById('slug-preview').textContent = currentSlug;
+
+  if(currentStructureId){
+    const { error } = await sb
+      .from('structures')
+      .update({ slug: currentSlug, content: state })
+      .eq('id', currentStructureId);
+    if(error){ setStatus('Errore: ' + error.message, true); }
+    else{ setStatus('Salvato ✓'); }
+  } else {
+    const { data, error } = await sb
+      .from('structures')
+      .insert({ slug: currentSlug, owner_id: currentUser.id, content: state })
+      .select()
+      .single();
+    if(error){ setStatus('Errore: ' + error.message, true); }
+    else{ currentStructureId = data.id; setStatus('Creata e salvata ✓'); }
   }
   renderPreview();
 }
@@ -611,6 +745,7 @@ function fillForm(){
   document.getElementById('f-whatsapp').value = state.whatsapp;
   renderRulesEditor();
   renderSpotsEditor();
+  renderEventsEditor();
   renderThemePicker();
 }
 
@@ -715,8 +850,47 @@ function renderSpotsEditor(){
   });
 }
 
+function renderEventsEditor(){
+  const wrap = document.getElementById('events-list');
+  wrap.innerHTML = '';
+  state.events.forEach((ev, i) => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <button class="remove" data-i="${i}">rimuovi</button>
+      <label>Titolo evento</label>
+      <input type="text" data-idx="${i}" data-field="titolo" class="event-input" value="${escapeHtml(ev.titolo)}">
+      <label>Data</label>
+      <input type="date" data-idx="${i}" data-field="data" class="event-input" value="${escapeHtml(ev.data)}">
+      <label>Descrizione</label>
+      <textarea data-idx="${i}" data-field="desc" class="event-input">${escapeHtml(ev.desc)}</textarea>
+    `;
+    wrap.appendChild(card);
+  });
+  wrap.querySelectorAll('.event-input').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const idx = +e.target.dataset.idx;
+      const field = e.target.dataset.field;
+      state.events[idx][field] = e.target.value;
+    });
+  });
+  wrap.querySelectorAll('.remove').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      state.events.splice(+e.target.dataset.i, 1);
+      renderEventsEditor();
+    });
+  });
+}
+
 function escapeHtml(s){
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const MESI_IT = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+function formatEventDate(iso){
+  const d = new Date(iso + 'T00:00:00');
+  if(isNaN(d)) return { day:'--', month:'' };
+  return { day: d.getDate(), month: MESI_IT[d.getMonth()] };
 }
 
 function renderPreview(){
@@ -751,6 +925,25 @@ function renderPreview(){
           </div>
         </div>`).join('')
     : '<p class="empty">Nessun consiglio aggiunto ancora.</p>';
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const futureEvents = state.events
+    .filter(ev => ev.data && new Date(ev.data + 'T00:00:00') >= today)
+    .sort((a,b) => a.data.localeCompare(b.data));
+  const eventsEl = document.getElementById('g-events');
+  eventsEl.innerHTML = futureEvents.length
+    ? futureEvents.map(ev => {
+        const { day, month } = formatEventDate(ev.data);
+        return `
+        <div class="event">
+          <div class="date-badge"><div class="day">${day}</div><div class="month">${month}</div></div>
+          <div>
+            <h3>${escapeHtml(ev.titolo)}</h3>
+            <p>${escapeHtml(ev.desc)}</p>
+          </div>
+        </div>`;
+      }).join('')
+    : '<p class="empty">Nessun evento in programma al momento.</p>';
 }
 
 document.getElementById('add-rule').addEventListener('click', ()=>{
@@ -761,15 +954,16 @@ document.getElementById('add-spot').addEventListener('click', ()=>{
   state.spots.push({ nome: 'Nuovo posto', desc: 'Descrizione', dist: '5 min' });
   renderSpotsEditor();
 });
+document.getElementById('add-event').addEventListener('click', ()=>{
+  state.events.push({ titolo: 'Nuovo evento', data: '', desc: 'Descrizione' });
+  renderEventsEditor();
+});
 document.getElementById('save-btn').addEventListener('click', saveState);
 
 document.getElementById('f-slug').addEventListener('input', e=>{
   document.getElementById('slug-preview').textContent = slugify(e.target.value);
 });
-document.getElementById('load-tenant').addEventListener('click', ()=>{
-  const slug = slugify(document.getElementById('f-slug').value);
-  loadState(slug);
-});
+document.getElementById('save-slug').addEventListener('click', saveState);
 
 document.getElementById('btn-panel').addEventListener('click', ()=>{
   document.getElementById('panel').style.display = 'block';
@@ -786,7 +980,29 @@ document.getElementById('btn-preview').addEventListener('click', ()=>{
   document.getElementById('btn-panel').classList.remove('active');
 });
 
-loadState(currentSlug);
+document.getElementById('send-magic-link').addEventListener('click', sendMagicLink);
+document.getElementById('auth-email').addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ sendMagicLink(); }
+});
+document.getElementById('logout-btn').addEventListener('click', logout);
+
+// ---------- AVVIO ----------
+sb.auth.onAuthStateChange((event, session) => {
+  if(session && session.user){
+    showApp(session.user);
+  } else {
+    showAuthGate();
+  }
+});
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if(session && session.user){
+    showApp(session.user);
+  } else {
+    showAuthGate();
+  }
+})();
 </script>
 </body>
 </html>
