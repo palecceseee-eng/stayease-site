@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayEase — Guida ospiti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16302E; --bg:#FBF8F2; --sand:#E8DCC3;
+    --lagoon:#3A7D7A; --lagoon-deep:#1F4E4B; --brick:#A8482F;
+    --muted:#6B6259; --line: rgba(22,48,46,0.12); --radius: 4px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{ max-width:480px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative; }
+
+  .g-hero{ background:var(--lagoon-deep); color:var(--bg); padding:52px 28px 40px; position:relative; overflow:hidden; }
+  .g-hero::after{
+    content:""; position:absolute; left:0; right:0; bottom:-1px; height:34px; background:var(--bg);
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
+    -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  }
+  .g-logo{ width:38px; height:38px; border-radius:50%; background:var(--brick); color:var(--bg); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500; flex:none; margin-bottom:14px; }
+  .g-eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--sand); opacity:0.85; margin:0 0 18px; }
+  .g-hero h1{ font-family:'Fraunces', serif; font-weight:500; font-size:38px; line-height:1.08; margin:0 0 12px; white-space:pre-line; }
+  .g-hero p{ font-size:15px; color:var(--sand); max-width:34ch; margin:0; }
+  .host-row{ display:flex; align-items:center; gap:10px; margin-top:26px; font-size:13px; color:var(--bg); opacity:0.9; }
+  .host-dot{ width:6px;height:6px;border-radius:50%; background:var(--brick); flex:none; }
+
+  .g-nav{ display:flex; gap:8px; padding:18px 20px 6px; overflow-x:auto; scrollbar-width:none; position:sticky; top:0; background:var(--bg); z-index:5; border-bottom:1px solid var(--line); }
+  .g-nav::-webkit-scrollbar{display:none;}
+  .g-nav a{ flex:none; font-family:'JetBrains Mono', monospace; font-size:11.5px; text-decoration:none; color:var(--ink); background:var(--sand); padding:8px 13px; border-radius:20px; white-space:nowrap; }
+
+  .g-section{ padding:38px 28px; border-bottom:1px solid var(--line); scroll-margin-top:64px; }
+  .g-kicker{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--lagoon); margin:0 0 8px; }
+  .g-section h2{ font-family:'Fraunces', serif; font-weight:500; font-size:24px; margin:0 0 18px; }
+
+  .wifi-card{ background:var(--lagoon-deep); color:var(--bg); border-radius:var(--radius); padding:22px; }
+  .wifi-field .label{ font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sand); opacity:0.75; margin-bottom:5px; }
+  .wifi-field .value{ font-family:'JetBrains Mono', monospace; font-size:16px; }
+  .wifi-field + .wifi-field{ margin-top:16px; }
+
+  .tide{ display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .tide > div{ flex:1; padding:18px 16px; }
+  .tide > div:first-child{ border-right:1px solid var(--line); }
+  .t-label{ font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .t-time{ font-family:'Fraunces', serif; font-size:26px; }
+
+  .rules{ list-style:none; margin:20px 0 0; padding:0; }
+  .rules li{ display:flex; gap:12px; padding:12px 0; border-top:1px solid var(--line); font-size:14.5px; }
+  .rules li:first-child{ border-top:none; }
+  .rules .mark{ font-family:'JetBrains Mono', monospace; color:var(--brick); flex:none; }
+
+  .spot{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line); }
+  .spot:first-of-type{ border-top:none; margin-top:4px; }
+  .spot .tag{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--sand); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--lagoon-deep); }
+  .spot h3{ font-weight:600; font-size:15px; margin:2px 0 4px; }
+  .spot p{ font-size:13.5px; color:var(--muted); margin:0; }
+  .spot .dist{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--lagoon); margin-top:6px; display:inline-block; }
+
+  .event{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line); }
+  .event:first-of-type{ border-top:none; margin-top:4px; }
+  .event .date-badge{ flex:none; width:44px; text-align:center; background:var(--sand); border-radius:var(--radius); padding:6px 0; }
+  .event .date-badge .day{ font-family:'Fraunces', serif; font-size:16px; font-weight:600; line-height:1.1; color:var(--ink); }
+  .event .date-badge .month{ font-family:'JetBrains Mono', monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  .event h3{ font-weight:600; font-size:15px; margin:2px 0 4px; }
+  .event p{ font-size:13.5px; color:var(--muted); margin:0; }
+
+  .contact{ background:var(--sand); border-radius:var(--radius); padding:22px; }
+  .contact p{ margin:0 0 16px; font-size:14px; }
+  .contact-btn{ display:flex; align-items:center; justify-content:space-between; background:var(--ink); color:var(--bg); text-decoration:none; padding:14px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; }
+  .contact-btn .arrow{ font-family:'JetBrains Mono', monospace; color:var(--brick); }
+
+  .g-footer{ padding:30px 28px 44px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.06em; color:var(--muted); text-align:center; }
+  .empty{ font-size:13px; color:var(--muted); font-style:italic; }
+
+  /* temi */
+  .wrap[data-theme="masseria"]{ --ink:#2B2620; --bg:#F5EEE1; --sand:#D9CBAE; --lagoon:#6B7A4F; --lagoon-deep:#4A3F2E; --brick:#8C4A2F; }
+  .wrap[data-theme="minimal"]{ --ink:#111111; --bg:#FFFFFF; --sand:#EDEDED; --lagoon:#111111; --lagoon-deep:#111111; --brick:#C1440E; --radius:0px; }
+  .wrap[data-theme="masseria"] .g-hero::after{ content:""; -webkit-mask-image:none; mask-image:none; height:3px; background:var(--brick); bottom:0; }
+  .wrap[data-theme="minimal"] .g-hero::after{ display:none; }
+  .wrap[data-theme="minimal"] .g-hero{ border-bottom:1px solid #fff; }
+  .wrap[data-theme="minimal"] .g-hero h1, .wrap[data-theme="minimal"] .g-section h2{ font-family:'Inter',sans-serif; font-weight:600; letter-spacing:-0.01em; }
+  .wrap[data-theme="minimal"] .g-nav a{ background:transparent; border:1px solid var(--ink); border-radius:0; }
+  .wrap[data-theme="minimal"] .spot .tag, .wrap[data-theme="minimal"] .event .date-badge, .wrap[data-theme="minimal"] .g-logo{ border-radius:0; }
+  .wrap[data-theme="minimal"] .wifi-card{ border:1px solid var(--ink); }
+  .wrap[data-theme="masseria"] .g-eyebrow, .wrap[data-theme="masseria"] .g-kicker{ font-style:italic; }
+
+  /* stati di caricamento / errore */
+  .state-screen{
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:32px; max-width:420px; margin:0 auto;
+  }
+  .state-screen .mono{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:14px; }
+  .state-screen h1{ font-family:'Fraunces', serif; font-weight:500; font-size:24px; margin:0 0 12px; }
+  .state-screen p{ font-size:14px; color:var(--muted); margin:0 0 20px; }
+  .state-screen a{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--lagoon-deep); }
+</style>
+</head>
+<body>
+
+<div id="loading" class="state-screen">
+  <p class="mono">StayEase</p>
+  <h1>Un attimo...</h1>
+  <p>Stiamo caricando la guida.</p>
+</div>
+
+<div id="not-found" class="state-screen" style="display:none;">
+  <p class="mono">StayEase</p>
+  <h1>Guida non trovata</h1>
+  <p>Non troviamo nessuna struttura con questo indirizzo. Controlla il QR code o contatta il tuo host.</p>
+  <a href="https://stayease.it">Torna a stayease.it</a>
+</div>
+
+<div class="wrap" id="guide" style="display:none;">
+  <div class="g-hero">
+    <div class="g-logo" id="g-logo">SE</div>
+    <p class="g-eyebrow" id="g-eyebrow">—</p>
+    <h1 id="g-titolo">—</h1>
+    <p id="g-sottotitolo"></p>
+    <div class="host-row">
+      <span class="host-dot"></span>
+      <span id="g-host"></span>
+    </div>
+  </div>
+
+  <nav class="g-nav">
+    <a href="#g-wifi">Wifi</a>
+    <a href="#g-orari">Orari &amp; regole</a>
+    <a href="#g-eventi">Eventi</a>
+    <a href="#g-zona">In zona</a>
+    <a href="#g-contatti">Contatti</a>
+  </nav>
+
+  <section class="g-section" id="g-wifi">
+    <p class="g-kicker">Connessione</p>
+    <h2>Wifi di casa</h2>
+    <div class="wifi-card">
+      <div class="wifi-field"><div class="label">Rete</div><div class="value" id="g-wifi-nome">—</div></div>
+      <div class="wifi-field"><div class="label">Password</div><div class="value" id="g-wifi-pass">—</div></div>
+    </div>
+  </section>
+
+  <section class="g-section" id="g-orari">
+    <p class="g-kicker">Da sapere</p>
+    <h2>Orari &amp; regole</h2>
+    <div class="tide">
+      <div><div class="t-label">Check-in</div><div class="t-time" id="g-checkin">—</div></div>
+      <div><div class="t-label">Check-out</div><div class="t-time" id="g-checkout">—</div></div>
+    </div>
+    <ul class="rules" id="g-rules"></ul>
+  </section>
+
+  <section class="g-section" id="g-eventi">
+    <p class="g-kicker">Da non perdere</p>
+    <h2>Eventi in zona</h2>
+    <div id="g-events"></div>
+  </section>
+
+  <section class="g-section" id="g-zona">
+    <p class="g-kicker">Consigli locali</p>
+    <h2>In giro</h2>
+    <div id="g-spots"></div>
+  </section>
+
+  <section class="g-section" id="g-contatti">
+    <p class="g-kicker">Serve aiuto?</p>
+    <h2>Scriveteci</h2>
+    <div class="contact">
+      <p>Siamo qui per qualsiasi cosa, anche solo un consiglio per la cena.</p>
+      <a class="contact-btn" id="g-whatsapp" href="#">
+        <span>Scrivi su WhatsApp</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="g-footer" id="g-footer">STAYEASE — GUIDA OSPITI</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Stesse chiavi usate in pannello.html — vanno inserite qui allo stesso modo.
+const SUPABASE_URL = 'https://hmtrwnhgyyccjrmzmlar.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SPxCmxLv_aj14JTbdadr1Q_lJIsI4CO';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const defaults = {
+  theme: 'laguna', nome: 'StayEase', titolo: 'Benvenuti.', sottotitolo: '',
+  host: '', logoIniziali: 'SE', wifiNome: '—', wifiPass: '—',
+  checkin: '—', checkout: '—', whatsapp: '', rules: [], spots: [], events: []
+};
+
+function escapeHtml(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const MESI_IT = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+function formatEventDate(iso){
+  const d = new Date(iso + 'T00:00:00');
+  if(isNaN(d)) return { day:'--', month:'' };
+  return { day: d.getDate(), month: MESI_IT[d.getMonth()] };
+}
+
+function renderGuide(state){
+  document.getElementById('guide').setAttribute('data-theme', state.theme || 'laguna');
+  document.getElementById('g-logo').textContent = state.logoIniziali || 'SE';
+  document.getElementById('g-eyebrow').textContent = state.nome;
+  document.getElementById('g-titolo').textContent = state.titolo;
+  document.getElementById('g-sottotitolo').textContent = state.sottotitolo;
+  document.getElementById('g-host').textContent = state.host ? `Ospitati da ${state.host}` : '';
+  document.getElementById('g-wifi-nome').textContent = state.wifiNome;
+  document.getElementById('g-wifi-pass').textContent = state.wifiPass;
+  document.getElementById('g-checkin').textContent = state.checkin;
+  document.getElementById('g-checkout').textContent = state.checkout;
+  document.getElementById('g-whatsapp').href = state.whatsapp ? `https://wa.me/${state.whatsapp}` : '#';
+  document.getElementById('g-footer').textContent = `${(state.nome || 'STAYEASE').toUpperCase()} — GUIDA OSPITI`;
+
+  const rulesEl = document.getElementById('g-rules');
+  rulesEl.innerHTML = (state.rules || []).length
+    ? state.rules.map(r => `<li><span class="mark">·</span>${escapeHtml(r)}</li>`).join('')
+    : '<li class="empty">Nessuna regola indicata.</li>';
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const futureEvents = (state.events || [])
+    .filter(ev => ev.data && new Date(ev.data + 'T00:00:00') >= today)
+    .sort((a,b) => a.data.localeCompare(b.data));
+  const eventsEl = document.getElementById('g-events');
+  eventsEl.innerHTML = futureEvents.length
+    ? futureEvents.map(ev => {
+        const { day, month } = formatEventDate(ev.data);
+        return `<div class="event"><div class="date-badge"><div class="day">${day}</div><div class="month">${month}</div></div><div><h3>${escapeHtml(ev.titolo)}</h3><p>${escapeHtml(ev.desc)}</p></div></div>`;
+      }).join('')
+    : '<p class="empty">Nessun evento in programma al momento.</p>';
+
+  const nums = ['①','②','③','④','⑤','⑥','⑦','⑧'];
+  const spotsEl = document.getElementById('g-spots');
+  spotsEl.innerHTML = (state.spots || []).length
+    ? state.spots.map((s,i) => `<div class="spot"><div class="tag">${nums[i] || (i+1)}</div><div><h3>${escapeHtml(s.nome)}</h3><p>${escapeHtml(s.desc)}</p><span class="dist">${escapeHtml(s.dist)}</span></div></div>`).join('')
+    : '<p class="empty">Nessun consiglio aggiunto ancora.</p>';
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('guide').style.display = 'block';
+}
+
+function showNotFound(){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('not-found').style.display = 'flex';
+}
+
+(async () => {
+  const slug = decodeURIComponent(window.location.pathname.replace(/^\/+|\/+$/g, ''));
+  if(!slug){
+    window.location.href = 'https://stayease.it';
+    return;
+  }
+  const { data, error } = await sb
+    .from('structures')
+    .select('content')
+    .eq('slug', slug)
+    .maybeSingle();
+
+  if(error || !data){
+    showNotFound();
+    return;
+  }
+  const state = { ...defaults, ...data.content };
+  renderGuide(state);
+})();
+</script>
+</body>
+</html>
