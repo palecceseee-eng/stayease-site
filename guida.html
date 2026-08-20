@@ -15,85 +15,97 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
   .wrap{ max-width:480px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative; }
+  button{ font-family:inherit; }
 
-  .g-hero{ background:var(--lagoon-deep); color:var(--bg); padding:52px 28px 40px; position:relative; overflow:hidden; }
-  .g-hero::after{
-    content:""; position:absolute; left:0; right:0; bottom:-1px; height:34px; background:var(--bg);
-    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
-    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 34' preserveAspectRatio='none'%3E%3Cpath d='M0 18 C 40 2, 80 2, 120 18 S 200 34, 240 18 S 320 2, 360 18 S 400 26, 400 18 V34 H0 Z'/%3E%3C/svg%3E");
-    -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  .wrap[data-theme="masseria"]{ --ink:#2B2620; --bg:#F5EEE1; --sand:#D9CBAE; --lagoon:#6B7A4F; --lagoon-deep:#4A3F2E; --brick:#8C4A2F; }
+  .wrap[data-theme="minimal"]{ --ink:#111111; --bg:#FFFFFF; --sand:#EDEDED; --lagoon:#111111; --lagoon-deep:#111111; --brick:#C1440E; --radius:0px; }
+  .wrap[data-theme="minimal"] .tile, .wrap[data-theme="minimal"] .g-logo, .wrap[data-theme="minimal"] .spot .tag, .wrap[data-theme="minimal"] .event .date-badge{ border-radius:0; }
+
+  #screen-lang{ min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:32px 28px; }
+  #screen-lang .mono{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--lagoon); margin:0 0 18px; text-align:center; }
+  .lang-grid{ display:flex; flex-direction:column; gap:10px; }
+  .lang-btn{
+    background:#fff; border:1.5px solid var(--line); border-radius:var(--radius);
+    padding:16px 20px; font-size:16px; font-weight:600; color:var(--ink);
+    text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
   }
+  .lang-btn .code{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); }
+  .lang-btn:active{ background:var(--sand); }
+
+  #screen-home{ display:none; }
+  .home-hero{ background:var(--lagoon-deep); color:var(--bg); padding:44px 28px 32px; position:relative; }
   .g-logo{ width:38px; height:38px; border-radius:50%; background:var(--brick); color:var(--bg); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500; flex:none; margin-bottom:14px; }
-  .g-eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--sand); opacity:0.85; margin:0 0 18px; }
-  .g-hero h1{ font-family:'Fraunces', serif; font-weight:500; font-size:38px; line-height:1.08; margin:0 0 12px; white-space:pre-line; }
-  .g-hero p{ font-size:15px; color:var(--sand); max-width:34ch; margin:0; }
-  .host-row{ display:flex; align-items:center; gap:10px; margin-top:26px; font-size:13px; color:var(--bg); opacity:0.9; }
-  .host-dot{ width:6px;height:6px;border-radius:50%; background:var(--brick); flex:none; }
+  .home-hero .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--sand); opacity:0.85; margin:0 0 10px; }
+  .home-hero h1{ font-family:'Fraunces', serif; font-weight:500; font-size:28px; line-height:1.1; margin:0 0 8px; white-space:pre-line; }
+  .home-hero .host{ font-size:13px; color:var(--sand); opacity:0.9; }
+  .lang-pill{
+    position:absolute; top:20px; right:20px;
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--sand);
+    border:1px solid rgba(251,248,242,0.4); border-radius:16px; padding:5px 10px; background:none; cursor:pointer;
+  }
 
-  .g-nav{ display:flex; gap:8px; padding:18px 20px 6px; overflow-x:auto; scrollbar-width:none; position:sticky; top:0; background:var(--bg); z-index:5; border-bottom:1px solid var(--line); }
-  .g-nav::-webkit-scrollbar{display:none;}
-  .g-nav a{ flex:none; font-family:'JetBrains Mono', monospace; font-size:11.5px; text-decoration:none; color:var(--ink); background:var(--sand); padding:8px 13px; border-radius:20px; white-space:nowrap; }
+  .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:24px 22px 40px; }
+  .tile{
+    aspect-ratio:1; background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    cursor:pointer; padding:16px;
+  }
+  .tile:active{ background:var(--sand); }
+  .tile svg{ width:28px; height:28px; stroke:var(--lagoon-deep); fill:none; stroke-width:1.6; }
+  .tile span{ font-size:13.5px; font-weight:600; text-align:center; }
 
-  .g-section{ padding:38px 28px; border-bottom:1px solid var(--line); scroll-margin-top:64px; }
-  .g-kicker{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--lagoon); margin:0 0 8px; }
-  .g-section h2{ font-family:'Fraunces', serif; font-weight:500; font-size:24px; margin:0 0 18px; }
+  #screen-detail{ display:none; }
+  .detail-header{
+    display:flex; align-items:center; gap:12px; padding:20px 22px;
+    border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--bg); z-index:5;
+  }
+  .back-btn{
+    background:none; border:1px solid var(--line); border-radius:50%;
+    width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;
+  }
+  .wrap[data-theme="minimal"] .back-btn{ border-radius:0; }
+  .back-btn svg{ width:16px; height:16px; stroke:var(--ink); fill:none; stroke-width:2; }
+  .detail-header h2{ font-family:'Fraunces', serif; font-weight:500; font-size:20px; margin:0; }
+  .wrap[data-theme="minimal"] .detail-header h2{ font-family:'Inter',sans-serif; font-weight:600; }
+  .detail-body{ padding:26px 22px 60px; }
 
   .wifi-card{ background:var(--lagoon-deep); color:var(--bg); border-radius:var(--radius); padding:22px; }
   .wifi-field .label{ font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sand); opacity:0.75; margin-bottom:5px; }
   .wifi-field .value{ font-family:'JetBrains Mono', monospace; font-size:16px; }
   .wifi-field + .wifi-field{ margin-top:16px; }
 
-  .tide{ display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .tide{ display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-bottom:20px; }
   .tide > div{ flex:1; padding:18px 16px; }
   .tide > div:first-child{ border-right:1px solid var(--line); }
   .t-label{ font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
-  .t-time{ font-family:'Fraunces', serif; font-size:26px; }
-
-  .rules{ list-style:none; margin:20px 0 0; padding:0; }
+  .t-time{ font-family:'Fraunces', serif; font-size:24px; }
+  .rules{ list-style:none; margin:0; padding:0; }
   .rules li{ display:flex; gap:12px; padding:12px 0; border-top:1px solid var(--line); font-size:14.5px; }
   .rules li:first-child{ border-top:none; }
   .rules .mark{ font-family:'JetBrains Mono', monospace; color:var(--brick); flex:none; }
 
   .spot{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line); }
-  .spot:first-of-type{ border-top:none; margin-top:4px; }
+  .spot:first-of-type{ border-top:none; }
   .spot .tag{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--sand); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--lagoon-deep); }
   .spot h3{ font-weight:600; font-size:15px; margin:2px 0 4px; }
   .spot p{ font-size:13.5px; color:var(--muted); margin:0; }
   .spot .dist{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--lagoon); margin-top:6px; display:inline-block; }
 
   .event{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line); }
-  .event:first-of-type{ border-top:none; margin-top:4px; }
+  .event:first-of-type{ border-top:none; }
   .event .date-badge{ flex:none; width:44px; text-align:center; background:var(--sand); border-radius:var(--radius); padding:6px 0; }
-  .event .date-badge .day{ font-family:'Fraunces', serif; font-size:16px; font-weight:600; line-height:1.1; color:var(--ink); }
+  .event .date-badge .day{ font-family:'Fraunces', serif; font-size:16px; font-weight:600; line-height:1.1; }
   .event .date-badge .month{ font-family:'JetBrains Mono', monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
   .event h3{ font-weight:600; font-size:15px; margin:2px 0 4px; }
   .event p{ font-size:13.5px; color:var(--muted); margin:0; }
 
-  .contact{ background:var(--sand); border-radius:var(--radius); padding:22px; }
-  .contact p{ margin:0 0 16px; font-size:14px; }
+  .contact-intro{ font-size:14px; color:var(--muted); margin:0 0 18px; }
   .contact-btn{ display:flex; align-items:center; justify-content:space-between; background:var(--ink); color:var(--bg); text-decoration:none; padding:14px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; }
   .contact-btn .arrow{ font-family:'JetBrains Mono', monospace; color:var(--brick); }
 
-  .g-footer{ padding:30px 28px 44px; font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.06em; color:var(--muted); text-align:center; }
   .empty{ font-size:13px; color:var(--muted); font-style:italic; }
 
-  /* temi */
-  .wrap[data-theme="masseria"]{ --ink:#2B2620; --bg:#F5EEE1; --sand:#D9CBAE; --lagoon:#6B7A4F; --lagoon-deep:#4A3F2E; --brick:#8C4A2F; }
-  .wrap[data-theme="minimal"]{ --ink:#111111; --bg:#FFFFFF; --sand:#EDEDED; --lagoon:#111111; --lagoon-deep:#111111; --brick:#C1440E; --radius:0px; }
-  .wrap[data-theme="masseria"] .g-hero::after{ content:""; -webkit-mask-image:none; mask-image:none; height:3px; background:var(--brick); bottom:0; }
-  .wrap[data-theme="minimal"] .g-hero::after{ display:none; }
-  .wrap[data-theme="minimal"] .g-hero{ border-bottom:1px solid #fff; }
-  .wrap[data-theme="minimal"] .g-hero h1, .wrap[data-theme="minimal"] .g-section h2{ font-family:'Inter',sans-serif; font-weight:600; letter-spacing:-0.01em; }
-  .wrap[data-theme="minimal"] .g-nav a{ background:transparent; border:1px solid var(--ink); border-radius:0; }
-  .wrap[data-theme="minimal"] .spot .tag, .wrap[data-theme="minimal"] .event .date-badge, .wrap[data-theme="minimal"] .g-logo{ border-radius:0; }
-  .wrap[data-theme="minimal"] .wifi-card{ border:1px solid var(--ink); }
-  .wrap[data-theme="masseria"] .g-eyebrow, .wrap[data-theme="masseria"] .g-kicker{ font-style:italic; }
-
-  /* stati di caricamento / errore */
-  .state-screen{
-    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:32px; max-width:420px; margin:0 auto;
-  }
+  .state-screen{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px; max-width:420px; margin:0 auto; }
   .state-screen .mono{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:14px; }
   .state-screen h1{ font-family:'Fraunces', serif; font-weight:500; font-size:24px; margin:0 0 12px; }
   .state-screen p{ font-size:14px; color:var(--muted); margin:0 0 20px; }
@@ -104,86 +116,54 @@
 
 <div id="loading" class="state-screen">
   <p class="mono">StayEase</p>
-  <h1>Un attimo...</h1>
-  <p>Stiamo caricando la guida.</p>
+  <h1>Un attimo... / One moment...</h1>
 </div>
 
 <div id="not-found" class="state-screen" style="display:none;">
   <p class="mono">StayEase</p>
   <h1>Guida non trovata</h1>
-  <p>Non troviamo nessuna struttura con questo indirizzo. Controlla il QR code o contatta il tuo host.</p>
+  <p>Non troviamo nessuna struttura con questo indirizzo.</p>
   <a href="https://stayease.it">Torna a stayease.it</a>
 </div>
 
-<div class="wrap" id="guide" style="display:none;">
-  <div class="g-hero">
-    <div class="g-logo" id="g-logo">SE</div>
-    <p class="g-eyebrow" id="g-eyebrow">—</p>
-    <h1 id="g-titolo">—</h1>
-    <p id="g-sottotitolo"></p>
-    <div class="host-row">
-      <span class="host-dot"></span>
-      <span id="g-host"></span>
+<div class="wrap" id="app" style="display:none;">
+
+  <div id="screen-lang">
+    <p class="mono">Italiano · Deutsch · Français · Español · Português</p>
+    <div class="lang-grid">
+      <button class="lang-btn" data-lang="it">Italiano <span class="code">IT</span></button>
+      <button class="lang-btn" data-lang="de">Deutsch <span class="code">DE</span></button>
+      <button class="lang-btn" data-lang="fr">Français <span class="code">FR</span></button>
+      <button class="lang-btn" data-lang="es">Español <span class="code">ES</span></button>
+      <button class="lang-btn" data-lang="pt">Português <span class="code">PT</span></button>
     </div>
   </div>
 
-  <nav class="g-nav">
-    <a href="#g-wifi">Wifi</a>
-    <a href="#g-orari">Orari &amp; regole</a>
-    <a href="#g-eventi">Eventi</a>
-    <a href="#g-zona">In zona</a>
-    <a href="#g-contatti">Contatti</a>
-  </nav>
-
-  <section class="g-section" id="g-wifi">
-    <p class="g-kicker">Connessione</p>
-    <h2>Wifi di casa</h2>
-    <div class="wifi-card">
-      <div class="wifi-field"><div class="label">Rete</div><div class="value" id="g-wifi-nome">—</div></div>
-      <div class="wifi-field"><div class="label">Password</div><div class="value" id="g-wifi-pass">—</div></div>
+  <div id="screen-home">
+    <div class="home-hero">
+      <button class="lang-pill" id="change-lang">🌐 <span id="lang-pill-code"></span></button>
+      <div class="g-logo" id="g-logo">SE</div>
+      <p class="eyebrow" id="g-eyebrow">—</p>
+      <h1 id="g-titolo">—</h1>
+      <p class="host" id="g-host"></p>
     </div>
-  </section>
+    <div class="tile-grid" id="tile-grid"></div>
+  </div>
 
-  <section class="g-section" id="g-orari">
-    <p class="g-kicker">Da sapere</p>
-    <h2>Orari &amp; regole</h2>
-    <div class="tide">
-      <div><div class="t-label">Check-in</div><div class="t-time" id="g-checkin">—</div></div>
-      <div><div class="t-label">Check-out</div><div class="t-time" id="g-checkout">—</div></div>
+  <div id="screen-detail">
+    <div class="detail-header">
+      <button class="back-btn" id="back-btn">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2 id="detail-title">—</h2>
     </div>
-    <ul class="rules" id="g-rules"></ul>
-  </section>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
 
-  <section class="g-section" id="g-eventi">
-    <p class="g-kicker">Da non perdere</p>
-    <h2>Eventi in zona</h2>
-    <div id="g-events"></div>
-  </section>
-
-  <section class="g-section" id="g-zona">
-    <p class="g-kicker">Consigli locali</p>
-    <h2>In giro</h2>
-    <div id="g-spots"></div>
-  </section>
-
-  <section class="g-section" id="g-contatti">
-    <p class="g-kicker">Serve aiuto?</p>
-    <h2>Scriveteci</h2>
-    <div class="contact">
-      <p>Siamo qui per qualsiasi cosa, anche solo un consiglio per la cena.</p>
-      <a class="contact-btn" id="g-whatsapp" href="#">
-        <span>Scrivi su WhatsApp</span>
-        <span class="arrow">→</span>
-      </a>
-    </div>
-  </section>
-
-  <footer class="g-footer" id="g-footer">STAYEASE — GUIDA OSPITI</footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Stesse chiavi usate in pannello.html — vanno inserite qui allo stesso modo.
 const SUPABASE_URL = 'https://hmtrwnhgyyccjrmzmlar.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_SPxCmxLv_aj14JTbdadr1Q_lJIsI4CO';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -194,56 +174,154 @@ const defaults = {
   checkin: '—', checkout: '—', whatsapp: '', rules: [], spots: [], events: []
 };
 
+const I18N = {
+  it: { wifi:"Wifi", orari:"Orari & regole", eventi:"Eventi", zona:"In zona", contatti:"Contatti",
+    wifiTitle:"Wifi di casa", rete:"Rete", password:"Password",
+    orariTitle:"Orari & regole", checkin:"Check-in", checkout:"Check-out", regoleTitle:"Regole della casa", nessunaRegola:"Nessuna regola indicata.",
+    eventiTitle:"Eventi in zona", nessunEvento:"Nessun evento in programma al momento.",
+    zonaTitle:"In giro", nessunConsiglio:"Nessun consiglio aggiunto ancora.",
+    contattiTitle:"Contatti", contattiIntro:"Siamo qui per qualsiasi cosa, anche solo un consiglio per la cena.", scriviWhatsapp:"Scrivi su WhatsApp",
+    ospitatiDa:"Ospitati da" },
+  de: { wifi:"WLAN", orari:"Zeiten & Regeln", eventi:"Termine", zona:"Umgebung", contatti:"Kontakt",
+    wifiTitle:"WLAN im Haus", rete:"Netzwerk", password:"Passwort",
+    orariTitle:"Zeiten & Regeln", checkin:"Check-in", checkout:"Check-out", regoleTitle:"Hausregeln", nessunaRegola:"Keine Regeln angegeben.",
+    eventiTitle:"Termine in der Nähe", nessunEvento:"Derzeit keine Termine geplant.",
+    zonaTitle:"In der Umgebung", nessunConsiglio:"Noch keine Empfehlungen hinzugefügt.",
+    contattiTitle:"Kontakt", contattiIntro:"Wir helfen gerne bei allem, auch bei einer Restaurantempfehlung.", scriviWhatsapp:"Auf WhatsApp schreiben",
+    ospitatiDa:"Gastgeber" },
+  fr: { wifi:"Wifi", orari:"Horaires & règles", eventi:"Événements", zona:"Environs", contatti:"Contact",
+    wifiTitle:"Wifi de la maison", rete:"Réseau", password:"Mot de passe",
+    orariTitle:"Horaires & règles", checkin:"Arrivée", checkout:"Départ", regoleTitle:"Règles de la maison", nessunaRegola:"Aucune règle indiquée.",
+    eventiTitle:"Événements à proximité", nessunEvento:"Aucun événement prévu pour le moment.",
+    zonaTitle:"Dans les environs", nessunConsiglio:"Aucune recommandation ajoutée pour le moment.",
+    contattiTitle:"Contact", contattiIntro:"Nous sommes là pour vous aider, même pour un conseil resto.", scriviWhatsapp:"Écrire sur WhatsApp",
+    ospitatiDa:"Accueilli par" },
+  es: { wifi:"Wifi", orari:"Horarios y normas", eventi:"Eventos", zona:"Por la zona", contatti:"Contacto",
+    wifiTitle:"Wifi de la casa", rete:"Red", password:"Contraseña",
+    orariTitle:"Horarios y normas", checkin:"Entrada", checkout:"Salida", regoleTitle:"Normas de la casa", nessunaRegola:"No se han indicado normas.",
+    eventiTitle:"Eventos cercanos", nessunEvento:"No hay eventos programados por ahora.",
+    zonaTitle:"Por la zona", nessunConsiglio:"Todavía no se han añadido recomendaciones.",
+    contattiTitle:"Contacto", contattiIntro:"Estamos aquí para lo que necesites, incluso una recomendación para cenar.", scriviWhatsapp:"Escribir por WhatsApp",
+    ospitatiDa:"Anfitriones" },
+  pt: { wifi:"Wifi", orari:"Horários e regras", eventi:"Eventos", zona:"Nos arredores", contatti:"Contacto",
+    wifiTitle:"Wifi da casa", rete:"Rede", password:"Palavra-passe",
+    orariTitle:"Horários e regras", checkin:"Check-in", checkout:"Check-out", regoleTitle:"Regras da casa", nessunaRegola:"Nenhuma regra indicada.",
+    eventiTitle:"Eventos nas redondezas", nessunEvento:"Sem eventos previstos no momento.",
+    zonaTitle:"Nos arredores", nessunConsiglio:"Ainda sem recomendações adicionadas.",
+    contattiTitle:"Contacto", contattiIntro:"Estamos aqui para o que precisar, mesmo só uma dica para jantar.", scriviWhatsapp:"Escrever no WhatsApp",
+    ospitatiDa:"Anfitriões" }
+};
+
+const ICONS = {
+  wifi: '<svg viewBox="0 0 24 24"><path d="M2 8.5a17 17 0 0 1 20 0" stroke-linecap="round"/><path d="M5.5 12.5a12 12 0 0 1 13 0" stroke-linecap="round"/><path d="M9 16.3a6.5 6.5 0 0 1 6 0" stroke-linecap="round"/><circle cx="12" cy="19.5" r="1" fill="currentColor" stroke="none"/></svg>',
+  orari: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  eventi: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke-linecap="round"/></svg>',
+  zona: '<svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg>',
+  contatti: '<svg viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 4V4z" stroke-linejoin="round"/></svg>'
+};
+
+let state = {};
+let lang = 'it';
+
 function escapeHtml(s){
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-const MESI_IT = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+const MESI = {
+  it:['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'],
+  de:['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
+  fr:['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'],
+  es:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],
+  pt:['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+};
 function formatEventDate(iso){
   const d = new Date(iso + 'T00:00:00');
   if(isNaN(d)) return { day:'--', month:'' };
-  return { day: d.getDate(), month: MESI_IT[d.getMonth()] };
+  return { day: d.getDate(), month: MESI[lang][d.getMonth()] };
 }
 
-function renderGuide(state){
-  document.getElementById('guide').setAttribute('data-theme', state.theme || 'laguna');
+function t(key){ return I18N[lang][key]; }
+
+function showScreen(id){
+  ['screen-lang','screen-home','screen-detail'].forEach(s=>{
+    document.getElementById(s).style.display = (s === id) ? 'block' : 'none';
+  });
+}
+
+function selectLang(code){
+  lang = code;
+  localStorage.setItem('stayease_lang', code);
+  document.getElementById('lang-pill-code').textContent = code.toUpperCase();
+  renderHome();
+  showScreen('screen-home');
+}
+
+function renderHome(){
+  document.getElementById('app').setAttribute('data-theme', state.theme || 'laguna');
   document.getElementById('g-logo').textContent = state.logoIniziali || 'SE';
   document.getElementById('g-eyebrow').textContent = state.nome;
   document.getElementById('g-titolo').textContent = state.titolo;
-  document.getElementById('g-sottotitolo').textContent = state.sottotitolo;
-  document.getElementById('g-host').textContent = state.host ? `Ospitati da ${state.host}` : '';
-  document.getElementById('g-wifi-nome').textContent = state.wifiNome;
-  document.getElementById('g-wifi-pass').textContent = state.wifiPass;
-  document.getElementById('g-checkin').textContent = state.checkin;
-  document.getElementById('g-checkout').textContent = state.checkout;
-  document.getElementById('g-whatsapp').href = state.whatsapp ? `https://wa.me/${state.whatsapp}` : '#';
-  document.getElementById('g-footer').textContent = `${(state.nome || 'STAYEASE').toUpperCase()} — GUIDA OSPITI`;
+  document.getElementById('g-host').textContent = state.host ? `${t('ospitatiDa')}: ${state.host}` : '';
 
-  const rulesEl = document.getElementById('g-rules');
-  rulesEl.innerHTML = (state.rules || []).length
-    ? state.rules.map(r => `<li><span class="mark">·</span>${escapeHtml(r)}</li>`).join('')
-    : '<li class="empty">Nessuna regola indicata.</li>';
+  const tiles = [
+    { key:'wifi', label:t('wifi'), icon:ICONS.wifi },
+    { key:'orari', label:t('orari'), icon:ICONS.orari },
+    { key:'eventi', label:t('eventi'), icon:ICONS.eventi },
+    { key:'zona', label:t('zona'), icon:ICONS.zona },
+    { key:'contatti', label:t('contatti'), icon:ICONS.contatti }
+  ];
+  const grid = document.getElementById('tile-grid');
+  grid.innerHTML = tiles.map(tile => `
+    <div class="tile" data-section="${tile.key}">
+      ${tile.icon}
+      <span>${tile.label}</span>
+    </div>`).join('');
+  grid.querySelectorAll('.tile').forEach(el=>{
+    el.addEventListener('click', ()=> openSection(el.dataset.section));
+  });
+}
 
-  const today = new Date(); today.setHours(0,0,0,0);
-  const futureEvents = (state.events || [])
-    .filter(ev => ev.data && new Date(ev.data + 'T00:00:00') >= today)
-    .sort((a,b) => a.data.localeCompare(b.data));
-  const eventsEl = document.getElementById('g-events');
-  eventsEl.innerHTML = futureEvents.length
-    ? futureEvents.map(ev => {
-        const { day, month } = formatEventDate(ev.data);
-        return `<div class="event"><div class="date-badge"><div class="day">${day}</div><div class="month">${month}</div></div><div><h3>${escapeHtml(ev.titolo)}</h3><p>${escapeHtml(ev.desc)}</p></div></div>`;
-      }).join('')
-    : '<p class="empty">Nessun evento in programma al momento.</p>';
+function openSection(key){
+  document.getElementById('detail-title').textContent = t(key === 'wifi' ? 'wifiTitle' : key === 'orari' ? 'orariTitle' : key === 'eventi' ? 'eventiTitle' : key === 'zona' ? 'zonaTitle' : 'contattiTitle');
+  const body = document.getElementById('detail-body');
 
-  const nums = ['①','②','③','④','⑤','⑥','⑦','⑧'];
-  const spotsEl = document.getElementById('g-spots');
-  spotsEl.innerHTML = (state.spots || []).length
-    ? state.spots.map((s,i) => `<div class="spot"><div class="tag">${nums[i] || (i+1)}</div><div><h3>${escapeHtml(s.nome)}</h3><p>${escapeHtml(s.desc)}</p><span class="dist">${escapeHtml(s.dist)}</span></div></div>`).join('')
-    : '<p class="empty">Nessun consiglio aggiunto ancora.</p>';
-
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('guide').style.display = 'block';
+  if(key === 'wifi'){
+    body.innerHTML = `
+      <div class="wifi-card">
+        <div class="wifi-field"><div class="label">${t('rete')}</div><div class="value">${escapeHtml(state.wifiNome)}</div></div>
+        <div class="wifi-field"><div class="label">${t('password')}</div><div class="value">${escapeHtml(state.wifiPass)}</div></div>
+      </div>`;
+  } else if(key === 'orari'){
+    const rulesHtml = (state.rules||[]).length
+      ? state.rules.map(r=>`<li><span class="mark">·</span>${escapeHtml(r)}</li>`).join('')
+      : `<li class="empty">${t('nessunaRegola')}</li>`;
+    body.innerHTML = `
+      <div class="tide">
+        <div><div class="t-label">${t('checkin')}</div><div class="t-time">${escapeHtml(state.checkin)}</div></div>
+        <div><div class="t-label">${t('checkout')}</div><div class="t-time">${escapeHtml(state.checkout)}</div></div>
+      </div>
+      <p class="t-label" style="margin-bottom:8px;">${t('regoleTitle')}</p>
+      <ul class="rules">${rulesHtml}</ul>`;
+  } else if(key === 'eventi'){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const future = (state.events||[]).filter(ev => ev.data && new Date(ev.data+'T00:00:00') >= today).sort((a,b)=>a.data.localeCompare(b.data));
+    body.innerHTML = future.length
+      ? future.map(ev=>{
+          const { day, month } = formatEventDate(ev.data);
+          return `<div class="event"><div class="date-badge"><div class="day">${day}</div><div class="month">${month}</div></div><div><h3>${escapeHtml(ev.titolo)}</h3><p>${escapeHtml(ev.desc)}</p></div></div>`;
+        }).join('')
+      : `<p class="empty">${t('nessunEvento')}</p>`;
+  } else if(key === 'zona'){
+    const nums = ['①','②','③','④','⑤','⑥','⑦','⑧'];
+    body.innerHTML = (state.spots||[]).length
+      ? state.spots.map((s,i)=>`<div class="spot"><div class="tag">${nums[i]||(i+1)}</div><div><h3>${escapeHtml(s.nome)}</h3><p>${escapeHtml(s.desc)}</p><span class="dist">${escapeHtml(s.dist)}</span></div></div>`).join('')
+      : `<p class="empty">${t('nessunConsiglio')}</p>`;
+  } else if(key === 'contatti'){
+    const href = state.whatsapp ? `https://wa.me/${state.whatsapp}` : '#';
+    body.innerHTML = `
+      <p class="contact-intro">${t('contattiIntro')}</p>
+      <a class="contact-btn" href="${href}"><span>${t('scriviWhatsapp')}</span><span class="arrow">→</span></a>`;
+  }
+  showScreen('screen-detail');
 }
 
 function showNotFound(){
@@ -251,24 +329,29 @@ function showNotFound(){
   document.getElementById('not-found').style.display = 'flex';
 }
 
+document.querySelectorAll('.lang-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> selectLang(btn.dataset.lang));
+});
+document.getElementById('back-btn').addEventListener('click', ()=> showScreen('screen-home'));
+document.getElementById('change-lang').addEventListener('click', ()=> showScreen('screen-lang'));
+
 (async () => {
   const slug = decodeURIComponent(window.location.pathname.replace(/^\/+|\/+$/g, ''));
-  if(!slug){
-    window.location.href = 'https://stayease.it';
-    return;
-  }
-  const { data, error } = await sb
-    .from('structures')
-    .select('content')
-    .eq('slug', slug)
-    .maybeSingle();
+  if(!slug){ window.location.href = 'https://stayease.it'; return; }
 
-  if(error || !data){
-    showNotFound();
-    return;
+  const { data, error } = await sb.from('structures').select('content').eq('slug', slug).maybeSingle();
+  if(error || !data){ showNotFound(); return; }
+
+  state = { ...defaults, ...data.content };
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  const savedLang = localStorage.getItem('stayease_lang');
+  if(savedLang && I18N[savedLang]){
+    selectLang(savedLang);
+  } else {
+    showScreen('screen-lang');
   }
-  const state = { ...defaults, ...data.content };
-  renderGuide(state);
 })();
 </script>
 </body>
