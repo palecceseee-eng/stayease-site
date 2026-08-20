@@ -129,9 +129,10 @@
 <div class="wrap" id="app" style="display:none;">
 
   <div id="screen-lang">
-    <p class="mono">Italiano · Deutsch · Français · Español · Português</p>
+    <p class="mono">Italiano · English · Deutsch · Français · Español · Português</p>
     <div class="lang-grid">
       <button class="lang-btn" data-lang="it">Italiano <span class="code">IT</span></button>
+      <button class="lang-btn" data-lang="en">English <span class="code">EN</span></button>
       <button class="lang-btn" data-lang="de">Deutsch <span class="code">DE</span></button>
       <button class="lang-btn" data-lang="fr">Français <span class="code">FR</span></button>
       <button class="lang-btn" data-lang="es">Español <span class="code">ES</span></button>
@@ -164,8 +165,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://hmtrwnhgyyccjrmzmlar.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_SPxCmxLv_aj14JTbdadr1Q_lJIsI4CO';
+const SUPABASE_URL = 'INSERISCI_QUI_IL_TUO_PROJECT_URL';
+const SUPABASE_KEY = 'INSERISCI_QUI_LA_TUA_PUBLISHABLE_KEY';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const defaults = {
@@ -182,6 +183,13 @@ const I18N = {
     zonaTitle:"In giro", nessunConsiglio:"Nessun consiglio aggiunto ancora.",
     contattiTitle:"Contatti", contattiIntro:"Siamo qui per qualsiasi cosa, anche solo un consiglio per la cena.", scriviWhatsapp:"Scrivi su WhatsApp",
     ospitatiDa:"Ospitati da" },
+  en: { wifi:"Wifi", orari:"Hours & rules", eventi:"Events", zona:"Nearby", contatti:"Contact",
+    wifiTitle:"House wifi", rete:"Network", password:"Password",
+    orariTitle:"Hours & rules", checkin:"Check-in", checkout:"Check-out", regoleTitle:"House rules", nessunaRegola:"No rules listed.",
+    eventiTitle:"Nearby events", nessunEvento:"No events scheduled right now.",
+    zonaTitle:"Nearby", nessunConsiglio:"No recommendations added yet.",
+    contattiTitle:"Contact", contattiIntro:"We're here for anything, even just a dinner recommendation.", scriviWhatsapp:"Message on WhatsApp",
+    ospitatiDa:"Hosted by" },
   de: { wifi:"WLAN", orari:"Zeiten & Regeln", eventi:"Termine", zona:"Umgebung", contatti:"Kontakt",
     wifiTitle:"WLAN im Haus", rete:"Netzwerk", password:"Passwort",
     orariTitle:"Zeiten & Regeln", checkin:"Check-in", checkout:"Check-out", regoleTitle:"Hausregeln", nessunaRegola:"Keine Regeln angegeben.",
@@ -228,6 +236,7 @@ function escapeHtml(s){
 }
 const MESI = {
   it:['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'],
+  en:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
   de:['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'],
   fr:['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'],
   es:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],
