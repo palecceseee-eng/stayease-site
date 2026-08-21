@@ -44,15 +44,15 @@
     border:1px solid rgba(251,248,242,0.4); border-radius:16px; padding:5px 10px; background:none; cursor:pointer;
   }
 
-  .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:24px 22px 40px; }
+  .tile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:22px 20px 40px; }
   .tile{
     aspect-ratio:1; background:#fff; border:1px solid var(--line); border-radius:var(--radius);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
-    cursor:pointer; padding:16px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px;
+    cursor:pointer; padding:14px;
   }
   .tile:active{ background:var(--sand); }
-  .tile svg{ width:28px; height:28px; stroke:var(--lagoon-deep); fill:none; stroke-width:1.6; }
-  .tile span{ font-size:13.5px; font-weight:600; text-align:center; }
+  .tile svg{ width:26px; height:26px; stroke:var(--lagoon-deep); fill:none; stroke-width:1.6; }
+  .tile span{ font-size:12.5px; font-weight:600; text-align:center; line-height:1.2; }
 
   #screen-detail{ display:none; }
   .detail-header{
@@ -84,12 +84,13 @@
   .rules li:first-child{ border-top:none; }
   .rules .mark{ font-family:'JetBrains Mono', monospace; color:var(--brick); flex:none; }
 
-  .spot{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line); }
-  .spot:first-of-type{ border-top:none; }
-  .spot .tag{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--sand); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--lagoon-deep); }
-  .spot h3{ font-weight:600; font-size:15px; margin:2px 0 4px; }
-  .spot p{ font-size:13.5px; color:var(--muted); margin:0; }
-  .spot .dist{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--lagoon); margin-top:6px; display:inline-block; }
+  .place{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line); }
+  .place:first-of-type{ border-top:none; }
+  .place .tag{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--sand); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--lagoon-deep); }
+  .place h3{ font-weight:600; font-size:15px; margin:2px 0 4px; }
+  .place p{ font-size:13.5px; color:var(--muted); margin:0 0 4px; }
+  .place .dist{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--lagoon); display:inline-block; margin-right:10px; }
+  .place .maps-link{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--brick); text-decoration:none; }
 
   .event{ display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line); }
   .event:first-of-type{ border-top:none; }
@@ -99,9 +100,17 @@
   .event h3{ font-weight:600; font-size:15px; margin:2px 0 4px; }
   .event p{ font-size:13.5px; color:var(--muted); margin:0; }
 
+  .numero-row{ display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid var(--line); }
+  .numero-row:first-child{ border-top:none; }
+  .numero-row .nome{ font-size:14.5px; font-weight:600; }
+  .numero-row a{ font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--lagoon-deep); text-decoration:none; }
+
+  .arrivo-text{ font-size:14.5px; color:var(--ink); margin:0 0 18px; white-space:pre-line; }
+
   .contact-intro{ font-size:14px; color:var(--muted); margin:0 0 18px; }
-  .contact-btn{ display:flex; align-items:center; justify-content:space-between; background:var(--ink); color:var(--bg); text-decoration:none; padding:14px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; }
-  .contact-btn .arrow{ font-family:'JetBrains Mono', monospace; color:var(--brick); }
+  .contact-btn, .review-btn{ display:flex; align-items:center; justify-content:space-between; background:var(--ink); color:var(--bg); text-decoration:none; padding:14px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; }
+  .review-btn + .review-btn{ margin-top:10px; }
+  .contact-btn .arrow, .review-btn .arrow{ font-family:'JetBrains Mono', monospace; color:var(--brick); }
 
   .empty{ font-size:13px; color:var(--muted); font-style:italic; }
 
@@ -172,60 +181,99 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const defaults = {
   theme: 'laguna', nome: 'StayEase', titolo: 'Benvenuti.', sottotitolo: '',
   host: '', logoIniziali: 'SE', wifiNome: '—', wifiPass: '—',
-  checkin: '—', checkout: '—', whatsapp: '', rules: [], spots: [], events: []
+  checkin: '—', checkout: '—', whatsapp: '',
+  rules: [], spots: [], events: [],
+  comeArrivare: { testo: '', mapsLink: '' },
+  trasporti: [], ristoranti: [], numeriUtili: [], recensioni: [],
+  visibleTiles: { wifi:true, orari:true, arrivo:true, trasporti:true, zona:true, ristoranti:true, eventi:true, numeri:true, contatti:true, recensione:true }
 };
 
 const I18N = {
-  it: { wifi:"Wifi", orari:"Orari & regole", eventi:"Eventi", zona:"In zona", contatti:"Contatti",
+  it: { wifi:"Wifi", orari:"Orari & regole", arrivo:"Come arrivare", trasporti:"Trasporti", zona:"Da vedere", ristoranti:"Bar e ristoranti", eventi:"Eventi", numeri:"Numeri utili", contatti:"Contatti", recensione:"Lascia una recensione",
     wifiTitle:"Wifi di casa", rete:"Rete", password:"Password",
     orariTitle:"Orari & regole", checkin:"Check-in", checkout:"Check-out", regoleTitle:"Regole della casa", nessunaRegola:"Nessuna regola indicata.",
+    arrivoTitle:"Come arrivare & parcheggio", nessunaInfoArrivo:"Nessuna informazione indicata.",
+    trasportiTitle:"Trasporti", nessunTrasporto:"Nessuna informazione sui trasporti.",
+    zonaTitle:"Cosa vedere", nessunConsiglio:"Nessun consiglio aggiunto ancora.",
+    ristorantiTitle:"Bar e ristoranti consigliati", nessunRistorante:"Nessun locale consigliato ancora.",
     eventiTitle:"Eventi in zona", nessunEvento:"Nessun evento in programma al momento.",
-    zonaTitle:"In giro", nessunConsiglio:"Nessun consiglio aggiunto ancora.",
+    numeriTitle:"Numeri utili & emergenze", nessunNumero:"Nessun numero indicato.",
     contattiTitle:"Contatti", contattiIntro:"Siamo qui per qualsiasi cosa, anche solo un consiglio per la cena.", scriviWhatsapp:"Scrivi su WhatsApp",
-    ospitatiDa:"Ospitati da" },
-  en: { wifi:"Wifi", orari:"Hours & rules", eventi:"Events", zona:"Nearby", contatti:"Contact",
+    recensioneTitle:"Lascia una recensione", recensioneIntro:"Se ti sei trovato bene, una recensione ci aiuta moltissimo.", nessunaRecensione:"Nessun link disponibile.",
+    ospitatiDa:"Ospitati da", vediMappa:"Vedi su Google Maps" },
+  en: { wifi:"Wifi", orari:"Hours & rules", arrivo:"Getting here", trasporti:"Transport", zona:"Sights", ristoranti:"Bars & restaurants", eventi:"Events", numeri:"Useful numbers", contatti:"Contact", recensione:"Leave a review",
     wifiTitle:"House wifi", rete:"Network", password:"Password",
     orariTitle:"Hours & rules", checkin:"Check-in", checkout:"Check-out", regoleTitle:"House rules", nessunaRegola:"No rules listed.",
+    arrivoTitle:"Getting here & parking", nessunaInfoArrivo:"No information provided.",
+    trasportiTitle:"Transport", nessunTrasporto:"No transport info yet.",
+    zonaTitle:"What to see", nessunConsiglio:"No recommendations added yet.",
+    ristorantiTitle:"Recommended bars & restaurants", nessunRistorante:"No places recommended yet.",
     eventiTitle:"Nearby events", nessunEvento:"No events scheduled right now.",
-    zonaTitle:"Nearby", nessunConsiglio:"No recommendations added yet.",
+    numeriTitle:"Useful numbers & emergencies", nessunNumero:"No numbers listed.",
     contattiTitle:"Contact", contattiIntro:"We're here for anything, even just a dinner recommendation.", scriviWhatsapp:"Message on WhatsApp",
-    ospitatiDa:"Hosted by" },
-  de: { wifi:"WLAN", orari:"Zeiten & Regeln", eventi:"Termine", zona:"Umgebung", contatti:"Kontakt",
+    recensioneTitle:"Leave a review", recensioneIntro:"If you enjoyed your stay, a review helps us a lot.", nessunaRecensione:"No link available.",
+    ospitatiDa:"Hosted by", vediMappa:"View on Google Maps" },
+  de: { wifi:"WLAN", orari:"Zeiten & Regeln", arrivo:"Anreise", trasporti:"Verkehrsmittel", zona:"Sehenswürdigkeiten", ristoranti:"Bars & Restaurants", eventi:"Termine", numeri:"Wichtige Nummern", contatti:"Kontakt", recensione:"Bewertung hinterlassen",
     wifiTitle:"WLAN im Haus", rete:"Netzwerk", password:"Passwort",
     orariTitle:"Zeiten & Regeln", checkin:"Check-in", checkout:"Check-out", regoleTitle:"Hausregeln", nessunaRegola:"Keine Regeln angegeben.",
+    arrivoTitle:"Anreise & Parken", nessunaInfoArrivo:"Keine Informationen angegeben.",
+    trasportiTitle:"Verkehrsmittel", nessunTrasporto:"Noch keine Informationen zu Verkehrsmitteln.",
+    zonaTitle:"Sehenswertes", nessunConsiglio:"Noch keine Empfehlungen hinzugefügt.",
+    ristorantiTitle:"Empfohlene Bars & Restaurants", nessunRistorante:"Noch keine Empfehlungen.",
     eventiTitle:"Termine in der Nähe", nessunEvento:"Derzeit keine Termine geplant.",
-    zonaTitle:"In der Umgebung", nessunConsiglio:"Noch keine Empfehlungen hinzugefügt.",
+    numeriTitle:"Wichtige Nummern & Notfälle", nessunNumero:"Keine Nummern angegeben.",
     contattiTitle:"Kontakt", contattiIntro:"Wir helfen gerne bei allem, auch bei einer Restaurantempfehlung.", scriviWhatsapp:"Auf WhatsApp schreiben",
-    ospitatiDa:"Gastgeber" },
-  fr: { wifi:"Wifi", orari:"Horaires & règles", eventi:"Événements", zona:"Environs", contatti:"Contact",
+    recensioneTitle:"Bewertung hinterlassen", recensioneIntro:"Wenn es Ihnen gefallen hat, hilft uns eine Bewertung sehr.", nessunaRecensione:"Kein Link verfügbar.",
+    ospitatiDa:"Gastgeber", vediMappa:"Auf Google Maps ansehen" },
+  fr: { wifi:"Wifi", orari:"Horaires & règles", arrivo:"Comment venir", trasporti:"Transports", zona:"À voir", ristoranti:"Bars & restaurants", eventi:"Événements", numeri:"Numéros utiles", contatti:"Contact", recensione:"Laisser un avis",
     wifiTitle:"Wifi de la maison", rete:"Réseau", password:"Mot de passe",
     orariTitle:"Horaires & règles", checkin:"Arrivée", checkout:"Départ", regoleTitle:"Règles de la maison", nessunaRegola:"Aucune règle indiquée.",
+    arrivoTitle:"Comment venir & stationnement", nessunaInfoArrivo:"Aucune information indiquée.",
+    trasportiTitle:"Transports", nessunTrasporto:"Aucune information sur les transports.",
+    zonaTitle:"À voir", nessunConsiglio:"Aucune recommandation ajoutée pour le moment.",
+    ristorantiTitle:"Bars & restaurants recommandés", nessunRistorante:"Aucune adresse recommandée pour le moment.",
     eventiTitle:"Événements à proximité", nessunEvento:"Aucun événement prévu pour le moment.",
-    zonaTitle:"Dans les environs", nessunConsiglio:"Aucune recommandation ajoutée pour le moment.",
+    numeriTitle:"Numéros utiles & urgences", nessunNumero:"Aucun numéro indiqué.",
     contattiTitle:"Contact", contattiIntro:"Nous sommes là pour vous aider, même pour un conseil resto.", scriviWhatsapp:"Écrire sur WhatsApp",
-    ospitatiDa:"Accueilli par" },
-  es: { wifi:"Wifi", orari:"Horarios y normas", eventi:"Eventos", zona:"Por la zona", contatti:"Contacto",
+    recensioneTitle:"Laisser un avis", recensioneIntro:"Si vous avez apprécié votre séjour, un avis nous aide beaucoup.", nessunaRecensione:"Aucun lien disponible.",
+    ospitatiDa:"Accueilli par", vediMappa:"Voir sur Google Maps" },
+  es: { wifi:"Wifi", orari:"Horarios y normas", arrivo:"Cómo llegar", trasporti:"Transporte", zona:"Qué ver", ristoranti:"Bares y restaurantes", eventi:"Eventos", numeri:"Números útiles", contatti:"Contacto", recensione:"Dejar una reseña",
     wifiTitle:"Wifi de la casa", rete:"Red", password:"Contraseña",
     orariTitle:"Horarios y normas", checkin:"Entrada", checkout:"Salida", regoleTitle:"Normas de la casa", nessunaRegola:"No se han indicado normas.",
+    arrivoTitle:"Cómo llegar y aparcamiento", nessunaInfoArrivo:"No se ha indicado información.",
+    trasportiTitle:"Transporte", nessunTrasporto:"Sin información de transporte todavía.",
+    zonaTitle:"Qué ver", nessunConsiglio:"Todavía no se han añadido recomendaciones.",
+    ristorantiTitle:"Bares y restaurantes recomendados", nessunRistorante:"Todavía no hay recomendaciones.",
     eventiTitle:"Eventos cercanos", nessunEvento:"No hay eventos programados por ahora.",
-    zonaTitle:"Por la zona", nessunConsiglio:"Todavía no se han añadido recomendaciones.",
+    numeriTitle:"Números útiles y emergencias", nessunNumero:"No se han indicado números.",
     contattiTitle:"Contacto", contattiIntro:"Estamos aquí para lo que necesites, incluso una recomendación para cenar.", scriviWhatsapp:"Escribir por WhatsApp",
-    ospitatiDa:"Anfitriones" },
-  pt: { wifi:"Wifi", orari:"Horários e regras", eventi:"Eventos", zona:"Nos arredores", contatti:"Contacto",
+    recensioneTitle:"Dejar una reseña", recensioneIntro:"Si lo has pasado bien, una reseña nos ayuda mucho.", nessunaRecensione:"No hay enlace disponible.",
+    ospitatiDa:"Anfitriones", vediMappa:"Ver en Google Maps" },
+  pt: { wifi:"Wifi", orari:"Horários e regras", arrivo:"Como chegar", trasporti:"Transportes", zona:"O que ver", ristoranti:"Bares e restaurantes", eventi:"Eventos", numeri:"Números úteis", contatti:"Contacto", recensione:"Deixar uma avaliação",
     wifiTitle:"Wifi da casa", rete:"Rede", password:"Palavra-passe",
     orariTitle:"Horários e regras", checkin:"Check-in", checkout:"Check-out", regoleTitle:"Regras da casa", nessunaRegola:"Nenhuma regra indicada.",
+    arrivoTitle:"Como chegar e estacionamento", nessunaInfoArrivo:"Nenhuma informação indicada.",
+    trasportiTitle:"Transportes", nessunTrasporto:"Ainda sem informações de transporte.",
+    zonaTitle:"O que ver", nessunConsiglio:"Ainda sem recomendações adicionadas.",
+    ristorantiTitle:"Bares e restaurantes recomendados", nessunRistorante:"Ainda sem recomendações.",
     eventiTitle:"Eventos nas redondezas", nessunEvento:"Sem eventos previstos no momento.",
-    zonaTitle:"Nos arredores", nessunConsiglio:"Ainda sem recomendações adicionadas.",
+    numeriTitle:"Números úteis e emergências", nessunNumero:"Nenhum número indicado.",
     contattiTitle:"Contacto", contattiIntro:"Estamos aqui para o que precisar, mesmo só uma dica para jantar.", scriviWhatsapp:"Escrever no WhatsApp",
-    ospitatiDa:"Anfitriões" }
+    recensioneTitle:"Deixar uma avaliação", recensioneIntro:"Se gostou da estadia, uma avaliação ajuda-nos muito.", nessunaRecensione:"Nenhum link disponível.",
+    ospitatiDa:"Anfitriões", vediMappa:"Ver no Google Maps" }
 };
 
 const ICONS = {
   wifi: '<svg viewBox="0 0 24 24"><path d="M2 8.5a17 17 0 0 1 20 0" stroke-linecap="round"/><path d="M5.5 12.5a12 12 0 0 1 13 0" stroke-linecap="round"/><path d="M9 16.3a6.5 6.5 0 0 1 6 0" stroke-linecap="round"/><circle cx="12" cy="19.5" r="1" fill="currentColor" stroke="none"/></svg>',
   orari: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  eventi: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke-linecap="round"/></svg>',
+  arrivo: '<svg viewBox="0 0 24 24"><path d="M3 13l1.5-5A2 2 0 0 1 6.4 6.5h11.2A2 2 0 0 1 19.5 8l1.5 5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2.5" y="13" width="19" height="5" rx="1.5"/><circle cx="7" cy="18.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="17" cy="18.5" r="1.3" fill="currentColor" stroke="none"/></svg>',
+  trasporti: '<svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="13" rx="2"/><path d="M3.5 10h17M7 17v2.5M17 17v2.5" stroke-linecap="round"/><circle cx="7.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/><circle cx="16.5" cy="13.5" r="0.8" fill="currentColor" stroke="none"/></svg>',
   zona: '<svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg>',
-  contatti: '<svg viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 4V4z" stroke-linejoin="round"/></svg>'
+  ristoranti: '<svg viewBox="0 0 24 24"><path d="M7 2.5v8a1.5 1.5 0 0 0 1.5 1.5v9.5M6 2.5v6M8 2.5v6M17 2.5c-1.4 0-2.5 2-2.5 5.5S15.6 13 17 13v8.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  eventi: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke-linecap="round"/></svg>',
+  numeri: '<svg viewBox="0 0 24 24"><path d="M5 4h3l2 5-2 1a11 11 0 0 0 6 6l1-2 5 2v3a2 2 0 0 1-2 2C10.5 21 3 13.5 3 6a2 2 0 0 1 2-2z" stroke-linejoin="round"/></svg>',
+  contatti: '<svg viewBox="0 0 24 24"><path d="M4 4h16v13H8l-4 4V4z" stroke-linejoin="round"/></svg>',
+  recensione: '<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6L12 3z" stroke-linejoin="round"/></svg>'
 };
 
 let state = {};
@@ -250,6 +298,10 @@ function formatEventDate(iso){
 
 function t(key){ return I18N[lang][key]; }
 
+function mapsLinkHtml(url){
+  return url ? `<a class="maps-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">${t('vediMappa')} →</a>` : '';
+}
+
 function showScreen(id){
   ['screen-lang','screen-home','screen-detail'].forEach(s=>{
     document.getElementById(s).style.display = (s === id) ? 'block' : 'none';
@@ -264,6 +316,8 @@ function selectLang(code){
   showScreen('screen-home');
 }
 
+const TILE_ORDER = ['wifi','orari','arrivo','trasporti','zona','ristoranti','eventi','numeri','contatti','recensione'];
+
 function renderHome(){
   document.getElementById('app').setAttribute('data-theme', state.theme || 'laguna');
   document.getElementById('g-logo').textContent = state.logoIniziali || 'SE';
@@ -271,13 +325,11 @@ function renderHome(){
   document.getElementById('g-titolo').textContent = state.titolo;
   document.getElementById('g-host').textContent = state.host ? `${t('ospitatiDa')}: ${state.host}` : '';
 
-  const tiles = [
-    { key:'wifi', label:t('wifi'), icon:ICONS.wifi },
-    { key:'orari', label:t('orari'), icon:ICONS.orari },
-    { key:'eventi', label:t('eventi'), icon:ICONS.eventi },
-    { key:'zona', label:t('zona'), icon:ICONS.zona },
-    { key:'contatti', label:t('contatti'), icon:ICONS.contatti }
-  ];
+  const visible = state.visibleTiles || {};
+  const tiles = TILE_ORDER
+    .filter(key => visible[key] !== false)
+    .map(key => ({ key, label: t(key), icon: ICONS[key] }));
+
   const grid = document.getElementById('tile-grid');
   grid.innerHTML = tiles.map(tile => `
     <div class="tile" data-section="${tile.key}">
@@ -289,9 +341,12 @@ function renderHome(){
   });
 }
 
+const TITLE_KEY = { wifi:'wifiTitle', orari:'orariTitle', arrivo:'arrivoTitle', trasporti:'trasportiTitle', zona:'zonaTitle', ristoranti:'ristorantiTitle', eventi:'eventiTitle', numeri:'numeriTitle', contatti:'contattiTitle', recensione:'recensioneTitle' };
+
 function openSection(key){
-  document.getElementById('detail-title').textContent = t(key === 'wifi' ? 'wifiTitle' : key === 'orari' ? 'orariTitle' : key === 'eventi' ? 'eventiTitle' : key === 'zona' ? 'zonaTitle' : 'contattiTitle');
+  document.getElementById('detail-title').textContent = t(TITLE_KEY[key]);
   const body = document.getElementById('detail-body');
+  const nums = ['①','②','③','④','⑤','⑥','⑦','⑧'];
 
   if(key === 'wifi'){
     body.innerHTML = `
@@ -299,6 +354,7 @@ function openSection(key){
         <div class="wifi-field"><div class="label">${t('rete')}</div><div class="value">${escapeHtml(state.wifiNome)}</div></div>
         <div class="wifi-field"><div class="label">${t('password')}</div><div class="value">${escapeHtml(state.wifiPass)}</div></div>
       </div>`;
+
   } else if(key === 'orari'){
     const rulesHtml = (state.rules||[]).length
       ? state.rules.map(r=>`<li><span class="mark">·</span>${escapeHtml(r)}</li>`).join('')
@@ -310,6 +366,28 @@ function openSection(key){
       </div>
       <p class="t-label" style="margin-bottom:8px;">${t('regoleTitle')}</p>
       <ul class="rules">${rulesHtml}</ul>`;
+
+  } else if(key === 'arrivo'){
+    const ca = state.comeArrivare || {};
+    body.innerHTML = ca.testo || ca.mapsLink
+      ? `${ca.testo ? `<p class="arrivo-text">${escapeHtml(ca.testo)}</p>` : ''}${mapsLinkHtml(ca.mapsLink)}`
+      : `<p class="empty">${t('nessunaInfoArrivo')}</p>`;
+
+  } else if(key === 'trasporti'){
+    body.innerHTML = (state.trasporti||[]).length
+      ? state.trasporti.map((tr,i)=>`<div class="place"><div class="tag">${nums[i]||(i+1)}</div><div><h3>${escapeHtml(tr.nome)}</h3><p>${escapeHtml(tr.desc)}</p>${mapsLinkHtml(tr.mapsLink)}</div></div>`).join('')
+      : `<p class="empty">${t('nessunTrasporto')}</p>`;
+
+  } else if(key === 'zona'){
+    body.innerHTML = (state.spots||[]).length
+      ? state.spots.map((s,i)=>`<div class="place"><div class="tag">${nums[i]||(i+1)}</div><div><h3>${escapeHtml(s.nome)}</h3><p>${escapeHtml(s.desc)}</p><span class="dist">${escapeHtml(s.dist)}</span>${mapsLinkHtml(s.mapsLink)}</div></div>`).join('')
+      : `<p class="empty">${t('nessunConsiglio')}</p>`;
+
+  } else if(key === 'ristoranti'){
+    body.innerHTML = (state.ristoranti||[]).length
+      ? state.ristoranti.map((r,i)=>`<div class="place"><div class="tag">${nums[i]||(i+1)}</div><div><h3>${escapeHtml(r.nome)}</h3><p>${escapeHtml(r.desc)}</p><span class="dist">${escapeHtml(r.dist)}</span>${mapsLinkHtml(r.mapsLink)}</div></div>`).join('')
+      : `<p class="empty">${t('nessunRistorante')}</p>`;
+
   } else if(key === 'eventi'){
     const today = new Date(); today.setHours(0,0,0,0);
     const future = (state.events||[]).filter(ev => ev.data && new Date(ev.data+'T00:00:00') >= today).sort((a,b)=>a.data.localeCompare(b.data));
@@ -319,16 +397,25 @@ function openSection(key){
           return `<div class="event"><div class="date-badge"><div class="day">${day}</div><div class="month">${month}</div></div><div><h3>${escapeHtml(ev.titolo)}</h3><p>${escapeHtml(ev.desc)}</p></div></div>`;
         }).join('')
       : `<p class="empty">${t('nessunEvento')}</p>`;
-  } else if(key === 'zona'){
-    const nums = ['①','②','③','④','⑤','⑥','⑦','⑧'];
-    body.innerHTML = (state.spots||[]).length
-      ? state.spots.map((s,i)=>`<div class="spot"><div class="tag">${nums[i]||(i+1)}</div><div><h3>${escapeHtml(s.nome)}</h3><p>${escapeHtml(s.desc)}</p><span class="dist">${escapeHtml(s.dist)}</span></div></div>`).join('')
-      : `<p class="empty">${t('nessunConsiglio')}</p>`;
+
+  } else if(key === 'numeri'){
+    body.innerHTML = (state.numeriUtili||[]).length
+      ? state.numeriUtili.map(n=>`<div class="numero-row"><span class="nome">${escapeHtml(n.nome)}</span><a href="tel:${escapeHtml(n.numero)}">${escapeHtml(n.numero)}</a></div>`).join('')
+      : `<p class="empty">${t('nessunNumero')}</p>`;
+
   } else if(key === 'contatti'){
     const href = state.whatsapp ? `https://wa.me/${state.whatsapp}` : '#';
     body.innerHTML = `
       <p class="contact-intro">${t('contattiIntro')}</p>
       <a class="contact-btn" href="${href}"><span>${t('scriviWhatsapp')}</span><span class="arrow">→</span></a>`;
+
+  } else if(key === 'recensione'){
+    const recs = state.recensioni || [];
+    body.innerHTML = `
+      <p class="contact-intro">${t('recensioneIntro')}</p>
+      ${recs.length
+        ? recs.map(r=>`<a class="review-btn" href="${escapeHtml(r.link)}" target="_blank" rel="noopener"><span>${escapeHtml(r.piattaforma)}</span><span class="arrow">→</span></a>`).join('')
+        : `<p class="empty">${t('nessunaRecensione')}</p>`}`;
   }
   showScreen('screen-detail');
 }
@@ -351,7 +438,7 @@ document.getElementById('change-lang').addEventListener('click', ()=> showScreen
   const { data, error } = await sb.from('structures').select('content').eq('slug', slug).maybeSingle();
   if(error || !data){ showNotFound(); return; }
 
-  state = { ...defaults, ...data.content };
+  state = { ...defaults, ...data.content, visibleTiles: { ...defaults.visibleTiles, ...(data.content.visibleTiles||{}) } };
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'block';
 
