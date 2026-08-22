@@ -44,6 +44,14 @@
   .url-preview{ font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--lagoon); margin-top:8px; }
   .url-preview span{ color:var(--muted); }
   .tenant-note{ font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--muted); margin-top:10px; line-height:1.6; }
+  .qr-block{ margin-top:18px; padding-top:18px; border-top:1px solid var(--line); display:flex; gap:16px; align-items:center; }
+  .qr-block img{ width:110px; height:110px; border:1px solid var(--line); border-radius:var(--radius); background:#fff; flex:none; }
+  .qr-actions{ display:flex; flex-direction:column; gap:8px; }
+  .qr-download{
+    display:inline-block; background:var(--ink); color:var(--bg); text-decoration:none;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:12.5px; padding:9px 14px; border-radius:var(--radius); text-align:center;
+  }
+  .qr-hint{ font-family:'JetBrains Mono', monospace; font-size:10px; color:var(--muted); line-height:1.5; }
 
   /* ---------- HOST PANEL FORM ---------- */
   #panel{ max-width:var(--panel-w); margin:0 auto; padding:32px 22px 80px; }
@@ -74,6 +82,14 @@
   .toggle-row:first-child{ border-top:none; }
   .toggle-row span{ font-size:14px; }
   .toggle-row input{ width:18px; height:18px; accent-color:var(--lagoon-deep); }
+  .insight-row{ display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--line); }
+  .insight-row:first-child{ border-top:none; }
+  .insight-row .label{ flex:1; font-size:14px; }
+  .insight-row .bar-wrap{ flex:none; width:90px; height:6px; background:var(--sand); border-radius:4px; overflow:hidden; }
+  .insight-row .bar{ height:100%; background:var(--lagoon-deep); }
+  .insight-row .count{ flex:none; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); width:28px; text-align:right; }
+  .insight-refresh{ background:none; border:1px solid var(--line); border-radius:16px; padding:6px 12px; font-family:'JetBrains Mono', monospace; font-size:11px; cursor:pointer; color:var(--ink); margin-bottom:6px; }
+  .insight-total{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); margin:0 0 12px; }
 
   /* theme picker */
   .theme-grid{ display:flex; flex-direction:column; gap:10px; }
@@ -194,6 +210,13 @@
   </div>
   <p class="url-preview"><span>stayease.it/</span><span id="slug-preview">casa-lisina</span></p>
   <p class="tenant-note">Questo è l'indirizzo che i tuoi ospiti apriranno dal QR code.</p>
+  <div class="qr-block">
+    <img id="qr-img" src="" alt="QR code della guida">
+    <div class="qr-actions">
+      <a class="qr-download" id="qr-download" href="#" download="stayease-qrcode.png" target="_blank">Scarica QR (PNG)</a>
+      <p class="qr-hint">Stampalo e mettilo in camera. Si aggiorna da solo se cambi lo slug.</p>
+    </div>
+  </div>
 </div>
 
 <!-- ============ HOST PANEL ============ -->
@@ -222,6 +245,14 @@
     <h2>Sezioni visibili</h2>
     <p class="hint">Disattiva i riquadri che non vuoi mostrare ai tuoi ospiti.</p>
     <div id="toggles-list"></div>
+  </div>
+
+  <div class="block">
+    <h2>Insight ospiti</h2>
+    <p class="hint">Quanti ospiti hanno aperto ogni riquadro della guida.</p>
+    <button class="insight-refresh" id="refresh-insights">↻ Aggiorna</button>
+    <p class="insight-total" id="insight-total"></p>
+    <div id="insights-list"></div>
   </div>
 
   <div class="block">
@@ -495,6 +526,13 @@ let previewLang = 'it';
 
 function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function slugify(raw){ return (raw||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'struttura'; }
+
+function updateQR(slug){
+  const url = `https://stayease.it/${slug}`;
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=${encodeURIComponent(url)}`;
+  document.getElementById('qr-img').src = qrSrc;
+  document.getElementById('qr-download').href = qrSrc;
+}
 function setStatus(msg, isErr){ const el=document.getElementById('status'); el.textContent=msg||''; el.style.color=isErr?'#D97757':''; if(msg){ setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; },2500);} }
 
 // ---------- AUTENTICAZIONE ----------
@@ -535,14 +573,17 @@ async function loadMyStructure(){
   }
   document.getElementById('f-slug').value = currentSlug;
   document.getElementById('slug-preview').textContent = currentSlug;
+  updateQR(currentSlug);
   fillForm();
   renderPreview();
+  renderInsights();
 }
 
 async function saveState(){
   readForm();
   currentSlug = slugify(document.getElementById('f-slug').value || currentSlug);
   document.getElementById('slug-preview').textContent = currentSlug;
+  updateQR(currentSlug);
   if(currentStructureId){
     const { error } = await sb.from('structures').update({ slug: currentSlug, content: state }).eq('id', currentStructureId);
     if(error){ setStatus('Errore: '+error.message, true); } else { setStatus('Salvato ✓'); }
@@ -717,7 +758,41 @@ function renderTogglesEditor(){
   });
 }
 
-// ---------- PREVIEW (identica alla guida vera) ----------
+// ---------- INSIGHT OSPITI ----------
+async function renderInsights(){
+  const wrap = document.getElementById('insights-list');
+  const totalEl = document.getElementById('insight-total');
+  if(!currentStructureId){
+    wrap.innerHTML = '';
+    totalEl.textContent = 'Salva la struttura almeno una volta per iniziare a raccogliere insight.';
+    return;
+  }
+  totalEl.textContent = 'Caricamento...';
+  const { data, error } = await sb.from('tile_clicks').select('tile_key').eq('structure_id', currentStructureId);
+  if(error){
+    totalEl.textContent = 'Errore nel caricamento delle insight.';
+    return;
+  }
+  const counts = {};
+  TILE_ORDER.forEach(k=> counts[k] = 0);
+  (data||[]).forEach(row=>{ if(counts[row.tile_key] !== undefined) counts[row.tile_key]++; });
+  const total = (data||[]).length;
+  const max = Math.max(1, ...Object.values(counts));
+
+  totalEl.textContent = total ? `${total} click totali registrati` : 'Ancora nessun click registrato.';
+  wrap.innerHTML = TILE_ORDER
+    .filter(key => state.visibleTiles[key] !== false)
+    .map(key => `
+      <div class="insight-row">
+        <span class="label">${TILE_LABELS_IT[key]}</span>
+        <span class="bar-wrap"><span class="bar" style="width:${(counts[key]/max*100)}%"></span></span>
+        <span class="count">${counts[key]}</span>
+      </div>`).join('');
+}
+
+document.getElementById('refresh-insights').addEventListener('click', renderInsights);
+
+
 function t(key){ return I18N[previewLang][key]; }
 function mapsLinkHtml(url){ return url ? `<a class="maps-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">${t('vediMappa')} →</a>` : ''; }
 function showScreen(id){ ['screen-lang','screen-home','screen-detail'].forEach(s=>{ document.getElementById(s).style.display = (s===id) ? 'block' : 'none'; }); }
@@ -799,7 +874,11 @@ document.getElementById('add-numero').addEventListener('click', ()=>{ state.nume
 document.getElementById('add-recensione').addEventListener('click', ()=>{ state.recensioni.push({piattaforma:'Lascia una recensione',link:''}); renderRecensioniEditor(); });
 
 document.getElementById('save-btn').addEventListener('click', saveState);
-document.getElementById('f-slug').addEventListener('input', e=>{ document.getElementById('slug-preview').textContent = slugify(e.target.value); });
+document.getElementById('f-slug').addEventListener('input', e=>{
+  const preview = slugify(e.target.value);
+  document.getElementById('slug-preview').textContent = preview;
+  updateQR(preview);
+});
 document.getElementById('save-slug').addEventListener('click', saveState);
 
 document.getElementById('btn-panel').addEventListener('click', ()=>{
