@@ -277,6 +277,7 @@ const ICONS = {
 };
 
 let state = {};
+let structureId = null;
 let lang = 'it';
 
 function escapeHtml(s){
@@ -343,7 +344,13 @@ function renderHome(){
 
 const TITLE_KEY = { wifi:'wifiTitle', orari:'orariTitle', arrivo:'arrivoTitle', trasporti:'trasportiTitle', zona:'zonaTitle', ristoranti:'ristorantiTitle', eventi:'eventiTitle', numeri:'numeriTitle', contatti:'contattiTitle', recensione:'recensioneTitle' };
 
+function logClick(key){
+  if(!structureId) return;
+  sb.from('tile_clicks').insert({ structure_id: structureId, tile_key: key }).then(()=>{});
+}
+
 function openSection(key){
+  logClick(key);
   document.getElementById('detail-title').textContent = t(TITLE_KEY[key]);
   const body = document.getElementById('detail-body');
   const nums = ['①','②','③','④','⑤','⑥','⑦','⑧'];
@@ -435,9 +442,10 @@ document.getElementById('change-lang').addEventListener('click', ()=> showScreen
   const slug = decodeURIComponent(window.location.pathname.replace(/^\/+|\/+$/g, ''));
   if(!slug){ window.location.href = 'https://stayease.it'; return; }
 
-  const { data, error } = await sb.from('structures').select('content').eq('slug', slug).maybeSingle();
+  const { data, error } = await sb.from('structures').select('id, content').eq('slug', slug).maybeSingle();
   if(error || !data){ showNotFound(); return; }
 
+  structureId = data.id;
   state = { ...defaults, ...data.content, visibleTiles: { ...defaults.visibleTiles, ...(data.content.visibleTiles||{}) } };
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'block';
