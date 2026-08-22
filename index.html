@@ -308,21 +308,13 @@
   <div>Lesina, Puglia</div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 
-// Ponte temporaneo: salva nel browser (localStorage) finché non colleghiamo Supabase.
-// Stessa interfaccia di window.storage, così il resto del codice non cambia.
-const storage = {
-  async get(key, shared){
-    const v = localStorage.getItem(key);
-    if(v === null) throw new Error('not found');
-    return { key, value: v, shared: !!shared };
-  },
-  async set(key, value, shared){
-    localStorage.setItem(key, value);
-    return { key, value, shared: !!shared };
-  }
-};
+const SUPABASE_URL = 'https://hmtrwnhgyyccjrmzmlar.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SPxCmxLv_aj14JTbdadr1Q_lJIsI4CO';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 function isValidEmail(v){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
@@ -341,18 +333,12 @@ document.getElementById('signup-btn').addEventListener('click', async ()=>{
   status.textContent = 'Invio in corso...';
   status.className = 'signup-status';
 
-  try{
-    const key = `stayease:lead:${Date.now()}`;
-    const result = await storage.set(key, JSON.stringify({ email, ts: new Date().toISOString() }), true);
-    if(result){
-      status.textContent = 'Fatto — ti scriviamo appena siamo pronti.';
-      status.className = 'signup-status ok';
-      input.value = '';
-    } else {
-      status.textContent = 'Non è andata a buon fine, riprova.';
-      status.className = 'signup-status err';
-    }
-  }catch(e){
+  const { error } = await sb.from('leads').insert({ email });
+  if(!error){
+    status.textContent = 'Fatto — ti scriviamo appena siamo pronti.';
+    status.className = 'signup-status ok';
+    input.value = '';
+  } else {
     status.textContent = 'Non è andata a buon fine, riprova.';
     status.className = 'signup-status err';
   }
